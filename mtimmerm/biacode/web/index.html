@@ -1,0 +1,566 @@
+<!DOCTYPE html PUBLIC "-//IETF//DTD HTML//EN">
+<html><head><script src="index_files/analytics.js" type="text/javascript"></script>
+<script type="text/javascript">window.addEventListener('DOMContentLoaded',function(){var v=archive_analytics.values;v.service='wb';v.server_name='wwwb-app224.us.archive.org';v.server_ms=409;archive_analytics.send_pageview({});});</script>
+<script type="text/javascript" src="index_files/bundle-playback.js" charset="utf-8"></script>
+<script type="text/javascript" src="index_files/wombat.js" charset="utf-8"></script>
+<script>window.RufflePlayer=window.RufflePlayer||{};window.RufflePlayer.config={"autoplay":"on","unmuteOverlay":"hidden"};</script>
+<script type="text/javascript" src="index_files/ruffle.js"></script>
+<script type="text/javascript">
+  __wm.init("https://web.archive.org/web");
+  __wm.wombat("http://www3.sympatico.ca/mt0000/biacode/biacode.html","20221127065119","https://web.archive.org/","web","https://web-static.archive.org/_static/",
+	      "1669531879");
+</script>
+<link rel="stylesheet" type="text/css" href="index_files/banner-styles.css">
+<link rel="stylesheet" type="text/css" href="index_files/iconochive.css">
+<!-- End Wayback Rewrite JS Include -->
+
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<meta name="GENERATOR" content="Microsoft FrontPage 2.0">
+<title>Bijective Arithmetic Encoding with Really Good End Treatment</title>
+</head>
+
+<body bgcolor="#FFFFFF"><!-- BEGIN WAYBACK TOOLBAR INSERT -->
+<script>__wm.rw(0);</script>
+<div id="wm-ipp-base" lang="en" style="display: block; direction: ltr;">
+</div><div id="wm-ipp-print">The Wayback Machine - https://web.archive.org/web/20221127065119/http://www3.sympatico.ca/mt0000/biacode/biacode.html</div>
+<script type="text/javascript">//<![CDATA[
+__wm.bt(725,27,25,2,"web","http://www3.sympatico.ca/mt0000/biacode/biacode.html","20221127065119",1996,"https://web-static.archive.org/_static/",["https://web-static.archive.org/_static/css/banner-styles.css?v=S1zqJCYt","https://web-static.archive.org/_static/css/iconochive.css?v=qtvMKcIJ"], false);
+  __wm.rw(1);
+//]]></script>
+<!-- END WAYBACK TOOLBAR INSERT -->
+ 
+
+<h1>Bijective Arithmetic Encoding<br>
+with Optimal End Treatment</h1>
+
+<p><em>Matt Timmermans, September 1999</em></p>
+
+<p>This page describes the operation of the bijective arithmetic
+compressor. This compressor has the nifty property that <em>any
+file at all</em> can be <em>decompressed</em> and then compressed
+back to its original form, in addition to the normal property
+that any file can be <em>compressed</em> and then decompressed
+back to its original form.</p>
+
+<p>One of the techniques used to accomplish this is a better way
+of indicating the end of the compressed stream.</p>
+
+<p>My simple bijective arithmetic compressor, with commented
+source, is here: <a href="https://web.archive.org/web/20221127065119/http://www3.sympatico.ca/mt0000/biacode/biacode.zip">biacode.zip</a></p>
+
+<p>David A. Scott's bijective Huffman compressor (the first
+bijective compressor known) can be found on <a href="https://web.archive.org/web/20221127065119/http://members.xoom.com/ecil/compress.htm">David's
+Compression Page</a></p>
+
+<p>The rest of this page describes the operation of the bijective
+arithmetic compressor in my own strange way -- it starts from the
+beginning and requires no prior knowledge of compression
+techniques, but it goes way too fast:</p>
+
+<h2>Contents</h2>
+
+<ul>
+    <li><a href="#ecode">Entropy Coding</a></li>
+    <li><a href="#acode">Arithmetic Coding</a></li>
+    <li><a href="#ending">End Treatment</a></li>
+    <li><a href="#huffend">End Treatment for Whole-Bit Encodings</a></li>
+    <li><a href="#bicomp">Bijective Arithmetic Compression</a></li>
+</ul>
+
+<h2><a name="ecode">Entropy Coding</a></h2>
+
+<p>We begin with a source of symbols, drawn from a known
+alphabet, and we are given the task of writing down the symbols
+as the source produces them.</p>
+
+<p>We are, in reality, a computer program, and so
+"writing" consists, for us, of producing a sequence of
+bits. We are also a <em>compression</em> program, and so our user
+expects us to write these symbols using as few bits as possible.</p>
+
+<p>Let us say that our alphabet consists of the 8 symbols
+ABCDEFGH. Each time we get a symbol from the source, then, there
+are 8 possibilities.</p>
+
+<p>Now, a bit, like the ones we must write, is a unit of
+information. A bit can be either 0 or 1 -- there are two
+possibilities. Writing a bit, therefore, conveys exactly enough
+information to <em>distinguish</em> between two possibilities.
+This is not enough information to uniquely identify every symbol
+in our alphabet, and so it is clear that we will (at least
+sometimes) be required to write more than one bit for each symbol
+of input.</p>
+
+<p>We are left considerable leeway in how to do this, however.</p>
+
+<p>Given an arbitrary symbol <em>x</em>, for example, we may
+adopt the following strategy:</p>
+
+<ul>
+    <li>If <em>x</em> = A or <em>x = </em>B, write 0. then:<ul>
+            <li>If <em>x=</em>A write 0</li>
+            <li>If <em>x=</em>B write 1</li>
+        </ul>
+    </li>
+    <li>If <em>x = </em>C or D or E or F or G or H, write 1,
+        then:<ul>
+            <li>If <em>x</em> = C or D, write 0, then:<ul>
+                    <li>If <em>x </em>= C, write 0</li>
+                    <li>If <em>x</em> = D, write 1</li>
+                </ul>
+            </li>
+            <li>If <em>x = </em>E or F or G or H write 1, then:<ul>
+                    <li>If <em>x = </em>E or F, write 0, then:<ul>
+                            <li>If <em>x = </em>E, write 0</li>
+                            <li>If <em>x = </em>F, write 1</li>
+                        </ul>
+                    </li>
+                    <li>If <em>x = </em>G or H, write 1, then:<ul>
+                            <li>If <em>x</em> = G, write 0</li>
+                            <li>If <em>x</em> = H, write 1</li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </li>
+</ul>
+
+<p>As you can see, since a bit provides exactly enough
+information to distinguish between two possibilities, we can use
+each bit we write the distinguish between two different <em>groups</em>
+of symbols. If the group we identify contains more than one
+symbol, we must divide it into two smaller groups and write
+another bit, etc., until a single symbol is identified.</p>
+
+<p>The sequence of bits we write for each symbol is that symbol's
+"code". Let's have a look at these:</p>
+<div align="left">
+
+<table border="1">
+    <tbody><tr>
+        <td align="center"><u>Symbol</u></td>
+        <td align="center"><u>Code</u></td>
+        <td align="center"><u>Code Length</u></td>
+    </tr>
+    <tr>
+        <td align="center">A</td>
+        <td align="center">00</td>
+        <td align="center">2</td>
+    </tr>
+    <tr>
+        <td align="center">B</td>
+        <td align="center">01</td>
+        <td align="center">2</td>
+    </tr>
+    <tr>
+        <td align="center">C</td>
+        <td align="center">100</td>
+        <td align="center">3</td>
+    </tr>
+    <tr>
+        <td align="center">D</td>
+        <td align="center">101</td>
+        <td align="center">3</td>
+    </tr>
+    <tr>
+        <td align="center">E</td>
+        <td align="center">1100</td>
+        <td align="center">4</td>
+    </tr>
+    <tr>
+        <td align="center">F</td>
+        <td align="center">1101</td>
+        <td align="center">4</td>
+    </tr>
+    <tr>
+        <td align="center">G</td>
+        <td align="center">1110</td>
+        <td align="center">4</td>
+    </tr>
+    <tr>
+        <td align="center">H</td>
+        <td align="center">1111</td>
+        <td align="center">4</td>
+    </tr>
+</tbody></table>
+</div>
+
+<p>Before we can ask ourselves just how efficient this method of
+encoding is, relative to the other possibilities, we have to
+figure out just how much freedom we have in choosing encodings.
+Clearly, by changing the way we divide the symbols into groups,
+we can change how many bits we write for each symbol. It is
+required, however, that each symbol can be uniquely identified in
+the end. Given an N symbol alphabet, with symbols from <img src="index_files/x1.jpg" align="top" width="16" height="23"> through <img src="index_files/xn.jpg" align="top" width="21" height="24">, this imples
+that:</p>
+
+<p><img src="index_files/lensum.jpg" width="69" height="45"></p>
+
+<p>Where <img src="index_files/li.jpg" align="top" width="17" height="24">is
+the code length of symbol <img src="index_files/xi.jpg" align="top" width="16" height="24">.</p>
+
+<p>With our example, this expands to 2*1/4 + 2*1/8 +4*1/16 = 1/2
++ 1/4 + 1/4 = 1, and we can see that it is true.</p>
+
+<p>So how efficient is this encoding? It depends on how common
+each of the symbols is, or to put it another way, for each
+possible symbol, how likely is it that a symbol from the source <em>is</em>
+that symbol?</p>
+
+<p>If all symbols are equally likely, then our average code
+length is (4*4+2*3+2*2)/8 = 26/8= 3.25 bits. If each symbol is
+equally likely, then, our encoding is certainly not the best we
+can do, because an encoding exists that uses only 3 bits per
+symbol ( 8*1/8 = 1).</p>
+
+<p>But what if A's and B's are more common than the other
+symbols? Our encoding uses 2 bits to encode A or B, but spends 4
+bits to encode E, F, G, or H. If a symbol is more likely to be A
+or B than it is to be E, F, G, or H, however, then we will write
+two bits for a symbol more often than we write 4, and our average
+code length will be <em>less</em> than 3 bits per symbol.</p>
+
+<p>So the efficiency of a particular encoding depends on the
+symbol probabilities. It is possible, in fact, to create an <em>optimal</em>
+encoding (the very best you can do) from the probabilities
+themselves, and the mapping is trivial.</p>
+
+<p>If we assign each symbol <img src="index_files/xi.jpg" align="top" width="16" height="24">a probability<img src="index_files/pi.jpg" align="top" width="16" height="24">, then the optimal encoding has <img src="index_files/2mli.jpg" align="top" width="28" height="20">=<img src="index_files/pi.jpg" align="top" width="16" height="24"> for every
+symbol. Since every symbol must be one of the symbols from our
+alphabet, the sum of all the symbol probabilities must be 1, and
+so the optimal encoding satisfies the constraint on the code
+lengths.</p>
+
+<p>Returning to our example, we see that our encoding is optimal
+when the probabilities of A,B,C,D,E,F,G,H are
+1/4,1/4,1/8.1/8,1/16,1/16,1/16,1/16. If we assume these
+probabilities and calculate our average code length (properly,
+weighting a symbol's length by its probability of occurring), we
+find that our average code length is 1/2*2+1/4*3+1/4*4 = 1+3/4+1
+= 2.75 bits per symbol -- much better than 3.</p>
+
+<p>Given that distribution of symbol probabilities, 2.75 bits per
+symbol (on average) is the very best you can do. In Shannon's
+information theory, 2.75 bits/symbol is the <em>entropy</em> of
+the source, and so the method of encoding that assigns optimal
+code lengths according to symbol probabilities is referred to as <em>entropy
+encoding</em>.</p>
+
+<h2><a name="acode">Arithmetic Coding</a></h2>
+
+<p>So far so good -- if we want to encode symbols from a source
+optimally, we just assign each symbol <img src="index_files/xi.jpg" align="top" width="16" height="24">a code with length <img src="index_files/li.jpg" align="top" width="17" height="24">=<img src="index_files/biacod8.jpg" align="top" width="57" height="24">, where <img src="index_files/pi.jpg" align="top" width="16" height="24"> is the
+probability of the symbol's occurrence.</p>
+
+<p>But wait! This only really works if <img src="index_files/pi.jpg" align="top" width="16" height="24">is a negative power of 2.
+Otherwise<img src="index_files/biacod8.jpg" align="top" width="57" height="24"> will not be an integer, so the optimal code length <img src="index_files/li.jpg" align="top" width="17" height="24"> will not be an
+integer. An optimal encoding would then have to write a
+non-integral number of bits!</p>
+
+<p>The good news is that, though it seems impossible to write,
+say 3.35 bits to encode a particular symbol, we can actually do
+it if we have lots of symbols to write.</p>
+
+<p>The very clever trick that makes this possible is this:</p>
+
+<ul>
+    <li>Rather than writing bits for each symbol, we write a
+        single number, in the range [0,1) that encodes the entire
+        source.</li>
+    <li>We are still a computer program, though, so we will write
+        this number as a sequence of bits. Specifically, if we
+        write it in binary with a decimal point, a number in the
+        interval [0,1) will be of the form 0.###########....,
+        where each # is either a 0 or a 1. We will encode our
+        number by writing out the bits to the right of the
+        decimal point.</li>
+    <li>To encode a symbol, rather than writing bits, we will
+        simply make a decision that reduces the range of numbers
+        we might finally right.</li>
+</ul>
+
+<p>To see how this works, let's examine our situation after we've
+seen all the symbols in the source, and made all of these
+"decisions that reduce the range of numbers we might
+write". We will be left having to write a number in some
+interval [x,x+R), where 0 &lt;= x &lt; x+R &lt;= 1. R is the
+final size of this range.</p>
+
+<p>The question is, then, "how many bits do we have to write
+before we get a number in this range"? The answer is always
+less than <img src="index_files/rbits.jpg" align="top" width="81" height="23">
+bits. Since a smaller final range means writing more bits, each
+of the range-reducing decisions we must make increases the number
+of bits we must write, but by how much?</p>
+
+<p>If we begin with a range [x,x+R) and encode a symbol by
+deciding that we will finally write a number in the range
+[x+lR,x+(l+P)R), where 0 &lt;= l &lt; l+P &lt; 1 and so x &lt;=
+x+lR &lt; x+(l+P)R &lt;= x+R, then we increase the number of bits
+we must write from <img src="index_files/rbits.jpg" align="top" width="81" height="23"> to <img src="index_files/BIACOD2.jpg" align="top" width="91" height="23">. The difference is:</p>
+
+<p><img src="index_files/BIACOD3.jpg" width="207" height="96"></p>
+
+<p>Oh, how marvellous!</p>
+
+<p>If we have an alphabet of N symbols, with probabilities <img src="index_files/pi.jpg" align="top" width="16" height="24">, and we have a
+current interval [x,x+R), we can divide the interval into N
+disjoint sub-intervals, one for each possible symbol <img src="index_files/xi.jpg" align="top" width="16" height="24">, and we can set
+the size of each symbol's sub-interval to <img src="index_files/pir.jpg" align="top" width="28" height="24">. To encode a symbol, then, we
+simply decide that we will finally write a number in that
+symbol's sub-interval. We replace the current interval with the
+sub-interval corresponding to the appropriate symbol <img src="index_files/xi.jpg" align="top" width="16" height="24">, which will
+result, in the end, in writing an optimal <img src="index_files/biacod8.jpg" align="top" width="57" height="24"> bits for that symbol -- even
+if <img src="index_files/biacod8.jpg" align="top" width="57" height="24"> is
+not an integer. Because the sub-intervals for possible symbols
+are disjoint, the person or program that will finally read the
+number we write can tell which symbol we encoded.</p>
+
+<h4>Implementation Notes</h4>
+
+<p>Real implementations of arithmetic encoding do not do all this
+math using very long binary numbers. Instead, numbers x and R
+that form the current interval [x,x+R) are stored as integers,
+scaled up by some power of 2 that keeps the interval size, R, in
+a workable range (typically (32768,65536] or so). Probabilities
+are stored as integers of slightly smaller size.</p>
+
+<p>When the interval size decreases past its lower bound, the
+scaling power increases, and the integers x and R are doubled,
+until R returns to an appropriate size.</p>
+
+<p>x, the lower bound on the interval, does not decrease as R
+does, and so repeated doubling would cause the integer to
+overflow. To prevent this, implementations write out the more
+significant bits of x as it increases.</p>
+
+<p>No matter how big you let x get before you write out its
+higher order bits, the possibility exists that the bits you <em>do</em>
+writeout might need to change due to carry propogation. When your
+interval is <img src="index_files/badrange.jpg" align="top" width="159" height="24">, for example, it is still possible to finally write <img src="index_files/badnum.jpg" align="top" width="72" height="21">. This causes
+1000 bits of x to change. Various implementations have different
+ways of dealing with this. My arithmetic encoder doesn't output 1
+bits, or the most recent 0 bit, immediately. Instead, it simply
+counts the number of 1's (say M) produced after the last zero.
+Upon producing another 0 bit, then, it will output a 0 followed
+by M ones. Upon receiving a 2 bit (i.e., a carry propogation), it
+will output a 1 followed by M zeros.</p>
+
+<h2><a name="ending">End Treatment</a></h2>
+
+<p>Arithmetic encoding, as presented so far, works just fine when
+we're writing an endless stream of symbols from some source to
+some sink. In real systems, though, this is often not the case --
+we are typically compressing an input file of finite length, and
+we expect to be able to decompress this to recreate the same
+file. To make this possible, we need to tell the decompressor how
+many symbols we write.</p>
+
+<p>There are two conventional approaches to this:</p>
+
+<ul>
+    <li>The first is simply to write out the length at the
+        beginning of the compressed stream. This consumes about
+        O(log(N)) bits, where log(N) is the length in symbols;</li>
+    <li>The second is to reserve a special EOF symbol that
+        doesn't occur in the input. When we're finished encoding
+        symbols from our source, we just write the EOF symbol at
+        the end, which tells the decoder to stop. Because we must
+        assign a probability to this symbol whenever we <em>might</em>
+        stop encoding, however, this makes the encoding of all
+        other symbols slightly less efficient, and wastes O(N)
+        bits altogether. Of course, the EOF symbol is usually
+        given a very small probability, so the wasted space
+        doesn't add up to much.</li>
+</ul>
+
+<p>Both of these methods are only slightly wasteful when the
+input is of any significant size. Still, the rest of the
+arithmetic encoding process is so nearly perfect that we find
+this blatant waste of bits to be annoying, and we present a
+better way.</p>
+
+<p>Recall that when we're finished encoding, we have to write a
+number in some interval [x,x+R), and we know that we have to
+write about <img src="index_files/rbits.jpg" align="top" width="81" height="23"> bits to do this. <em>Exactly</em> how many bits it
+takes, however, depends on the bits we <em>don't</em> write.</p>
+
+<p>Conventional arithmetic encoders will accept an input of
+finite length and write out a number with finite precision. By
+specifying <img src="index_files/rbits.jpg" align="top" width="81" height="23"> bits, the encoder can make sure that the number it
+writes is in the required range no matter what the decoder thinks
+about the bits that follow -- if the encoder were to continue
+writing any number of 1's and zeros, the number would still be in
+the proper range.</p>
+
+<p>We can do slightly better if we assume that unwritten bits are
+zero. An arithmetic encoder that adopts this approach will accept
+an input of finite length and write out a number of infinite
+precision that is "finitely odd". "Finitely
+odd" means that the right-most 1 bit is finitely far from
+the beginning of the output or, equivalently, that the number it
+writes is divisible by some negative power of 2.</p>
+
+<p>In the "binary decimal" representation that an
+arithemtic encoder writes, a finitely odd number is either:</p>
+
+<ul>
+    <li>an infinite string of 0s; or</li>
+    <li>a finite number of 0s and 1s, followed by the last 1,
+        followed by an infinite string of zeros.</li>
+</ul>
+
+<p>In any case, when the arithmetic encoder writes a finitely odd
+number, it simply omits the infinite zero tail, and the decoder
+assumes that unwritten bits are all zero.</p>
+
+<p>When we're finished encoding, then, and we must write a number
+in [x,x+R), we write some finitely odd number in that range, but
+we write it with infinite precision. There are an infinite number
+of such numbers in <em>any</em> range, and we could encode any
+one of them. We can achieve better end handling by using the
+number we <em>do</em> write to tell the decoder where the end of
+file is. The procedure is as follows:</p>
+
+<p>During our encoding, we will eventually arrive at the first
+place that the input might end, and we know that whether it ends
+or not, we will write a number in the range <img src="index_files/er1.jpg" align="top" width="79" height="23">. We simply decide that <em>if</em>
+the input <em>does</em> end here, we will write out the <em>most
+even</em> number in that range, resulting in the shortest
+possible output that identifies that range. Let's call this
+number <img src="index_files/e1.jpg" align="top" width="19" height="23">. On
+the other hand, if the input <em>does not</em> end here, we
+simply continue encoding normally.</p>
+
+<p>Eventually, we will arrive at the second place that the input
+might end, and we know that whether it ends or not, we must write
+a number in <img src="index_files/er2.jpg" align="top" width="84" height="23">.
+Now we decide that if the input <em>does</em> end here, we will
+write out the <em>most even</em> number in the range that is <em>not</em><img src="index_files/e1.jpg" align="top" width="19" height="23">. (we can't write
+<img src="index_files/e1.jpg" align="top" width="19" height="23">, of course,
+because that would mean that means the file ends at the previous
+possible position). This number will be <img src="index_files/e2.jpg" align="top" width="21" height="23">. Otherwise we continue on.</p>
+
+<p>Eventually, the input will actually end, and we will write out
+the most even number in the final range that does <em>not</em>
+indicate a previous end.</p>
+
+<p>The complete algorithm does this:</p>
+
+<ul>
+    <li>Whenever the input <em>might</em> end, but does not, we
+        reserve the most even number in the current range that is
+        not already reserved, and then encode the symbol.</li>
+    <li>When we encode a symbol, we reduce the range of numbers
+        we might write, and so we can forget about all the
+        reserved numbers that are <em>not</em> in the new range.</li>
+    <li>When the input <em>does</em> end, we write out the most
+        even number in the valid range that is <em>not</em>
+        already reserved.</li>
+</ul>
+
+<p>Indicating the end of file in this way does not waste any bits
+at all, and has another interesting property. If every valid
+input is the <em>prefix</em> of a <em>longer</em> valid input,
+then any finitely odd number at all will <em>decomress</em> to a
+valid input, and that input will <em>compress</em> back to the
+very same finitely odd number, i.e., an arithmetic compressor
+like this is a <em>bijection</em> between its inputs and the
+finitely odd numbers.</p>
+
+<h2><a name="huffend">End Treatment for Whole-Bit Encodings</a></h2>
+
+<p>Before going on to the next section, let's return whole-bit
+encoding, which we discussed first in the <a name="entropy coding">entropy coding</a> section above. These are
+called "prefix-free" codes, because no symbol's
+bit-code is the prefix of any other. Every such encoding,
+including the popular Huffman encoding, is a special case of
+arithmetic encoding that limits the size of the range to negative
+powers of two, and so the same end treatment we use for
+arithmetic encoding works for these types of codes as well.</p>
+
+<p>For prefix-free codes, however, the situation is much simpler
+than with arithmetic encoding in general, because there can be at
+most two end numbers reserved at any time:</p>
+
+<ul>
+    <li>At the first place where the input might end, there are
+        no ends reserved, so we reserve 0000... after the bits
+        we've already written out to indicate an end at this
+        position.</li>
+    <li>At the next place where the file might end, 000.... will
+        still be reserved if we wrote only zeros since the last
+        possible ending position. In this case we reserve
+        1000.... for this position, otherwise we reserve 000....</li>
+    <li>At the next ending position, 000.... will still be
+        reserved iff:<ul>
+            <li>000... was reserved before, and we wrote only
+                zeros to get to the next ending position, or</li>
+            <li>100... was reserved before, and we wrote a 1
+                followed by zeros to get to the next ending
+                position.</li>
+        </ul>
+        <p>In any case, by the time we get to a new ending
+        position, we will have written at least one whole bit,
+        and so 1000... will certainly not be reserved. At any end
+        position, then, if 000.. is reserved, then 100... is
+        always available for use.</p>
+    </li>
+</ul>
+
+<h2><a name="bicomp">Bijective Arithmetic Compression</a></h2>
+
+<p>Our compressor so far is a bijection from its valid inputs to
+the finitely odd numbers. Unfortunately, however, real
+compressors don't write finitely odd numbers -- they write files,
+where a file is a finite sequence of bytes, each consisting of 8
+bits.</p>
+
+<p>Even though our end handling is very efficient, we'd like to
+go one small step further and make our compressor a bijection
+from its inputs to <em>files</em>. This is where the bijective
+property becomes interesting, because then any file at all can be
+<em>decompressed</em>, even if it wasn't compressed to begin
+with. The decompressed file can the be compressed again to
+produce exactly the same file we started with.</p>
+
+<p>To accomplish this, we use a trivial prefix-free encoding from
+files to finitely odd numbers. This is a prefix-free code that
+simply maps each 8-bit byte to itself, but we apply the whole-bit
+end treatment to make this encoding into a trivial bijection from
+files to finitely odd numbers. More importantly, it makes the
+trivial decoder into a bijection from finitely odd numbers to
+files.</p>
+
+<p>To make a bijective arithmetic compressor then, we just need
+to do TrivialDecode(ArithmeticEncode(input)). The arithmetic
+encoder translates its input into a finitely odd number, and the
+trivial decoder translates this into a finite sequence of bytes.
+The corresponding bijective arithmetic decompressor is simply
+ArithmeticDecode(TrivialEncode(input)).</p>
+
+
+
+</body></html>
+<!--
+     FILE ARCHIVED ON 06:51:19 Nov 27, 2022 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 01:40:14 May 18, 2024.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->
+<!--
+playback timings (ms):
+  captures_list: 1.736
+  exclusion.robots: 0.477
+  exclusion.robots.policy: 0.45
+  esindex: 0.024
+  cdx.remote: 5.744
+  LoadShardBlock: 105.281 (3)
+  PetaboxLoader3.datanode: 259.182 (5)
+  load_resource: 265.775
+  PetaboxLoader3.resolve: 56.787
+  loaddict: 23.844
+-->

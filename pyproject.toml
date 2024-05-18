@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "textcoder"
+version = "0.1.0"
+description = ""
+authors = ["Shawn Zivontsis <shawnz@shawnz.org>"]
+readme = "README.md"
+package-mode = false
+
+[tool.poetry.dependencies]
+python = "^3.10"
+jupyter = "^1.0.0"
+numpy = "^1.26.4"
+sympy = "^1.12"
+matplotlib = "^3.8.3"
+
+
+[tool.poetry.group.dev.dependencies]
+pandas = "^2.2.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
