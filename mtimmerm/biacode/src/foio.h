@@ -24,78 +24,83 @@
 
 typedef unsigned char BYTE;
 
-
 //===========================================================================
 //  BytesAsFoBitsOutBif: wrap an output stream
 //===========================================================================
 
 class BytesAsFOBitsOutBuf : public std::streambuf
-  {
-  public:
-  BytesAsFOBitsOutBuf(std::ostream &bytestream,int bytesperblock=1);
-  ~BytesAsFOBitsOutBuf()
-    {End();}
-  void End();
-  private:
-  std::ostream &base;
-  long segsize; //for output: number of zero bytes at the end so far
-  int blocksize,blockleft;
-  char buf[256];
-  char segfirst;
-  bool reserve0;
-  virtual int overflow(int c);
-  virtual int sync();
-  };
+{
+public:
+    BytesAsFOBitsOutBuf(std::ostream &bytestream, int bytesperblock = 1);
+    ~BytesAsFOBitsOutBuf()
+    {
+        End();
+    }
+    void End();
 
+private:
+    std::ostream &base;
+    long segsize; // for output: number of zero bytes at the end so far
+    int blocksize, blockleft;
+    char buf[256];
+    char segfirst;
+    bool reserve0;
+    virtual int overflow(int c);
+    virtual int sync();
+};
 
 //===========================================================================
 //  BytesAsFoBitsInBuf: wrap an input stream
 //===========================================================================
 
 class BytesAsFOBitsInBuf : public std::streambuf
-  {
-  public:
-  BytesAsFOBitsInBuf(std::istream &bytestream,int bytesperblock=1);
-  private:
-  std::istream &base;
-  int blocksize,blockleft;
-  bool in_done;   //input from base is finished
-  bool reserve0;
-  char buf[256];
-  virtual int underflow();
-  };
+{
+public:
+    BytesAsFOBitsInBuf(std::istream &bytestream, int bytesperblock = 1);
 
+private:
+    std::istream &base;
+    int blocksize, blockleft;
+    bool in_done; // input from base is finished
+    bool reserve0;
+    char buf[256];
+    virtual int underflow();
+};
 
 //===========================================================================
 //  Streams to use the streambufs
 //===========================================================================
 
-//this is needed to avoid a bug in my compiler
+// this is needed to avoid a bug in my compiler
 typedef std::ostream stdostream;
 typedef std::istream stdistream;
 
 class FOBitOStream : public stdostream
-  {
-  public:
-  FOBitOStream(std::ostream &base,int blocksize=1)
-    : stdostream(&buffer),buffer(base,blocksize)
-    {}
-  void End()
-    {buffer.End();}
-  private:
-  BytesAsFOBitsOutBuf buffer;
-  };
+{
+public:
+    FOBitOStream(std::ostream &base, int blocksize = 1)
+        : stdostream(&buffer), buffer(base, blocksize)
+    {
+    }
+    void End()
+    {
+        buffer.End();
+    }
+
+private:
+    BytesAsFOBitsOutBuf buffer;
+};
 
 class FOBitIStream : public stdistream
-  {
-  public:
-  FOBitIStream(std::istream &base,int blocksize=1)
-    : stdistream(&buffer),buffer(base,blocksize)
-    {}
-  private:
-  BytesAsFOBitsInBuf buffer;
-  };
+{
+public:
+    FOBitIStream(std::istream &base, int blocksize = 1)
+        : stdistream(&buffer), buffer(base, blocksize)
+    {
+    }
 
+private:
+    BytesAsFOBitsInBuf buffer;
+};
 
 #endif
-
