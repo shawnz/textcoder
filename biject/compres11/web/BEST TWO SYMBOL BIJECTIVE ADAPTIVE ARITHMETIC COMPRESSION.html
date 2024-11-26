@@ -1,0 +1,162 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252"><script src="BEST%20TWO%20SYMBOL%20BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/athena.js" type="text/javascript"></script>
+<script type="text/javascript">window.addEventListener('DOMContentLoaded',function(){var v=archive_analytics.values;v.service='wb';v.server_name='wwwb-app219.us.archive.org';v.server_ms=276;archive_analytics.send_pageview({});});</script>
+<script type="text/javascript" src="BEST%20TWO%20SYMBOL%20BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/bundle-playback.js" charset="utf-8"></script>
+<script type="text/javascript" src="BEST%20TWO%20SYMBOL%20BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/wombat.js" charset="utf-8"></script>
+<script>window.RufflePlayer=window.RufflePlayer||{};window.RufflePlayer.config={"autoplay":"on","unmuteOverlay":"hidden"};</script>
+<script type="text/javascript" src="BEST%20TWO%20SYMBOL%20BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/ruffle.js"></script>
+<script type="text/javascript">
+    __wm.init("https://web.archive.org/web");
+  __wm.wombat("http://bijective.dogma.net/compres11.htm","20210512073150","https://web.archive.org/","web","/_static/",
+	      "1620804710");
+</script>
+<link rel="stylesheet" type="text/css" href="BEST%20TWO%20SYMBOL%20BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/banner-styles.css">
+<link rel="stylesheet" type="text/css" href="BEST%20TWO%20SYMBOL%20BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/iconochive.css">
+<!-- End Wayback Rewrite JS Include -->
+<title>BEST TWO SYMBOL BIJECTIVE ADAPTIVE ARITHMETIC COMPRESSION</title></head>
+<body background="BEST%20TWO%20SYMBOL%20BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/01_bkg4.jpg"><!-- BEGIN WAYBACK TOOLBAR INSERT -->
+<script>__wm.rw(0);</script>
+<div id="wm-ipp-base" lang="en" style="display: block; direction: ltr; height: 285px;">
+</div><div id="wm-ipp-print">The Wayback Machine - https://web.archive.org/web/20210512073150/http://bijective.dogma.net/compres11.htm</div>
+<script type="text/javascript">//<![CDATA[
+__wm.bt(725,27,25,2,"web","http://bijective.dogma.net/compres11.htm","20210512073150",1996,"/_static/",["/_static/css/banner-styles.css?v=S1zqJCYt","/_static/css/iconochive.css?v=3PDvdIFv"], false);
+  __wm.rw(1);
+//]]></script>
+<!-- END WAYBACK TOOLBAR INSERT -->
+ 
+
+
+<center><h2>David' Scott's  NEW STYLE BIJECTIVE ARITHMETIC COMPRESSION</h2></center>
+<p>
+
+
+<i>files updated on July 26,2004<br></i>
+
+</p><h3>
+<a href="https://web.archive.org/web/20210512073150/http://bijective.dogma.net/compres1.htm">old pages soon to go away</a> <p>
+<a href="https://web.archive.org/web/20210512073150/http://bijective.dogma.net/compres10.htm">link to more old soon to  go away</a> </p><p>
+
+ 
+</p></h3><h4>
+<a href="https://web.archive.org/web/20210512073150/http://bijective.dogma.net/arb2x.zip">NEW STABLE 2 STATE BIJECTIVE COMPRESSOR arb2x.zip</a><p>
+<a href="https://web.archive.org/web/20210512073150/http://bijective.dogma.net/arb255.zip">NEW STABLE ARB255 BIJECTIVE COMPRESSOR arb255.zip</a>
+</p></h4>
+<font size="+1"><b><pre>
+
+
+ This code was meant to be a full model of the optimal
+2 state bijective compressor decompressor with optimal EOS
+handling so one can easily write true bijective file or
+string compressors.
+ 
+   There are many ways to end the 2 state arithmetically
+so that its bijective. However if one keeps true to the
+theory of arithmetic compresstion. The free end method
+of Matt Timmermans seems to be the best in that every time
+a new symbol is compressed if the file ends it would slowly
+grow. In my methods where you add the expanding symbol then
+you can effectively limit it to "free ends" of zero one or
+two bits plus the length of expanding symbol which could in
+certain cases be quite long. I don't think this is exactly
+how Matt would have done it so I call it a modifed free end
+method.
+
+   The  code is robust enough so the interval can be chopped
+up in random ways from call to call. The code is designed
+to work on high low registers from "1" bit  to "64" bits.
+Note this means at one bit 
+First_qtr = 0 Half = 1 Third_qtr = 1 Top_value = 1
+for two bits
+First_qtr = 1 Half = 2 Third_qtr = 3 Top_value = 3
+for three bits
+First_qtr = 0 Half = 2 Third_qtr = 3 Top_value = 4
+the code does not test for the number of bits.
+However certain things like FRX where extended free
+ends are used are most likely not needed for the
+64 bit case where 2**64 states for free ends are
+available.
+
+  This code is again only to show the basic single
+2 state coder. It would only cause compresssion
+on a file or string where  the ratio 1's to 0's
+is extreme. And no compression where the number of ones
+equals the number of zeros.  Note by no compression
+the length could still change one or two bits due
+to the bijective string to bytes transforms.
+
+Here is  how  one would could compress pure strings
+of ascii ones and zeroes.
+Where ratio is large.
+A012B01 filex file1  /* convert ascii one zero to binary */
+ARB2X file1 file2    /* compress file1 bijective compression to file2 */
+B012A01 file2 filey   /* convert file2 back to an ascii one zero bytes */
+ see <a href="https://web.archive.org/web/20210512073150/http://bijective.dogma.net/a012b01.zip">a012b01.zip</a> for the acsii one zero to 
+binary bijective byte transform programs.
+
+if input 64 bytes:
+0000000000000000000000000000000000000000000000000000000000000000 
+following result if "1" bit width high low used virtually no compression
+0110000011010011110011110110011001011111101011010111000000010010 
+following with "2" bit high lows some compression
+101000001101001111001111011001100 
+same with "3" bit widths more compression
+100111110010110000 
+same with "4" 
+100111110000"ZZ" 
+same with "62"
+100011100 
+same with "63"
+100011100 
+same with "64"
+100011100 
+
+Note at higher bit widths this simple example gets the same
+strings This is not what happens when the input is longer
+and radomly changing. In fact after several bits there is
+almost no corrolation between the 64 and 63 bit file output
+however there compressed lengths would be about the same. 
+start change values.
+   See the new ARB255 which is new version using this improved
+2 state cell with 255 nodes it compress most files slightly
+better and its less apt to fail. I never got the old one to
+fail by I am sure that for at least 1 out of 2**42 files it
+would fail. I don't think the new one will fail. It more
+solid.
+
+
+
+
+</pre></b></font>
+
+ MORE LATER
+ 
+
+<center>
+<a href="https://web.archive.org/web/20210512073150/http://bijective.dogma.net/index.htm">ENTER here for MY Home Page</a><br>
+<!--
+<H3>Please Turn off JavaScript Active-x or any advanced features before entering</H3> </CENTER>
+-->
+
+
+
+</center></body></html>
+<!--
+     FILE ARCHIVED ON 07:31:50 May 12, 2021 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 00:52:25 Nov 26, 2024.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->
+<!--
+playback timings (ms):
+  captures_list: 0.582
+  exclusion.robots: 0.027
+  exclusion.robots.policy: 0.015
+  esindex: 0.011
+  cdx.remote: 21.02
+  LoadShardBlock: 147.778 (3)
+  PetaboxLoader3.datanode: 103.097 (4)
+  PetaboxLoader3.resolve: 88.16 (2)
+  load_resource: 81.817
+-->

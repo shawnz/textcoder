@@ -1,0 +1,202 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252"><script src="BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/athena.js" type="text/javascript"></script>
+<script type="text/javascript">window.addEventListener('DOMContentLoaded',function(){var v=archive_analytics.values;v.service='wb';v.server_name='wwwb-app224.us.archive.org';v.server_ms=207;archive_analytics.send_pageview({});});</script>
+<script type="text/javascript" src="BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/bundle-playback.js" charset="utf-8"></script>
+<script type="text/javascript" src="BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/wombat.js" charset="utf-8"></script>
+<script>window.RufflePlayer=window.RufflePlayer||{};window.RufflePlayer.config={"autoplay":"on","unmuteOverlay":"hidden"};</script>
+<script type="text/javascript" src="BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/ruffle.js"></script>
+<script type="text/javascript">
+    __wm.init("https://web.archive.org/web");
+  __wm.wombat("http://bijective.dogma.net/compres10.htm","20210512085751","https://web.archive.org/","web","/_static/",
+	      "1620809871");
+</script>
+<link rel="stylesheet" type="text/css" href="BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/banner-styles.css">
+<link rel="stylesheet" type="text/css" href="BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/iconochive.css">
+<!-- End Wayback Rewrite JS Include -->
+<title>BIJECTIVE ADAPTIVE ARITHMETIC COMPRESSION</title></head>
+<body background="BIJECTIVE%20ADAPTIVE%20ARITHMETIC%20COMPRESSION_files/01_bkg4.jpg"><!-- BEGIN WAYBACK TOOLBAR INSERT -->
+<script>__wm.rw(0);</script>
+<div id="wm-ipp-base" lang="en" style="display: block; direction: ltr;">
+</div><div id="wm-ipp-print">The Wayback Machine - https://web.archive.org/web/20210512085751/http://bijective.dogma.net/compres10.htm</div>
+<script type="text/javascript">//<![CDATA[
+__wm.bt(725,27,25,2,"web","http://bijective.dogma.net/compres10.htm","20210512085751",1996,"/_static/",["/_static/css/banner-styles.css?v=S1zqJCYt","/_static/css/iconochive.css?v=3PDvdIFv"], false);
+  __wm.rw(1);
+//]]></script>
+<!-- END WAYBACK TOOLBAR INSERT -->
+ 
+
+
+<center><h2>David' Scott's  BIJECTIVE ARITHMETIC COMPRESSION</h2></center>
+<p>
+
+
+<i>files updated on April 30,2001<br></i>
+
+</p><h3>
+
+ This is a prodcedure to change a simple arithmetic
+compressor and change it to a 
+<a href="https://web.archive.org/web/20210512085751/http://bijective.dogma.net/arib.zip">bijective adaptive arithmetic compressor</a> so
+that any 8-bit binary file can be thought of as
+either a compressed file or as a uncompressed file.<p>
+ The disadvantages of a standard arithmetic compressor
+are two fold. One you carry a wasted table entry for
+the EOF symbol which forces other entries to have a
+slightly longer encoding. Two you have to write an
+EOF symbol to the compressed file every time you
+terminate the compressing so many times you add
+this last character even when its not needed.</p><p>
+  There are many ways to make an arithmetic compressor
+bijective. They just don't seem to be in the open
+literature. I feel that the reason for this is that
+compression that is not bijective can greatly weaken
+encryption.</p><p>
+  One clever way to do a bijective arithmetic compressor
+is to do it the way Matt Timmermans did it with his 
+method of multiple free ends. I am going to do it an
+alternate way that I hope is easy to follow.</p><p>
+  Fist look at a huffman tabel where symbols are
+arranged in order from least likely to most likely
+</p></h3>
+<pre>A 1111
+B 1110
+C 110
+D 101
+E 100
+F 011
+G 010
+H 00
+</pre>
+<h3>
+
+ When writting a bijective huffman compressor I normally compress
+to the infinite finitely odd file. This file has a one a finite
+distance into the string that is the last one in the string.
+Later I map from this string to a 8-bit field file. I cover
+this transform in other places at my website.<p>
+  Since to end one really wants to make sure the last symbol
+has a one bit in it. Notice the H symbol does not. So any time
+a file ends with H or H followed by E's I could add one more
+E and then I have a unique representation in infinite bit stream
+I am compressing to.  </p><p>
+  First thing to note is that I really didn't have to use
+the E symbol any symbol other than H could have been used.
+For my simple adaptive aritmetic bijective compressor I
+choose to use G the next most frequently used symbol.
+This is great for Huffman where every symbol used has at least
+one bit and G from table above will always have at least one
+one bit set. What about in arithmetic?</p><p>
+  Well H in arithmetic since its the most common symbol could
+have less then "one bit". What is lower limit on G ( the next
+most probable symbol ) That limit is "one bit" and that occurs
+when H occurs 50% of the time and G occurs the other 50% of the
+time with rest of symbol occuring 0% of time. Also note
+any time G is longer than One bit H is as long or longer than
+G in terms of number of bits. Also notice any time H less then
+one bit since it makes up more than 50% likely hood and G has to
+be less than 50% so that its going to be more than one bit in
+length.</p><p>
+   Next now that will know G is at least one bit. How can we
+be sure that it will contian a one bit.</p><p>
+Look at Top_values its all ones. notice that when you stop
+playing at the end of encoding each symbol. There is a "High"
+and a "Low" value state that is carried into start of encoding
+each symbol. Notice also the low at carryover always starts
+with a "zero" ( most significant bit) and the high always
+starst with a "one". What a person is doing is allowing
+only the next bits to come from that range. Since the second
+most common symbol is after the first it and it smallest
+length is 1 it has to have a one.</p><p>
+   Here is a good point for you to test my code. It will always
+be as small or smaller than the old way.
+it incudes examples you can get it <a href="https://web.archive.org/web/20210512085751/http://bijective.dogma.net/arib.zip">here</a>
+</p><p>
+   The next question is even though its bijective could one
+save more space than my simple example. Yes one way is by
+choosing a different arangement of where in the table you
+place the segments. For example I only write out extra end
+symbol when the last symbol was all zeroes. It makes
+sense to make the least occuring symbol to use the all
+zero segment. But one has to be carful since if you do this
+you have to assure your self that the most common symbol
+has partial bit stream that will force a one or you have to
+make code complicated. One could use different arrangements
+of segments depending on how many bits have to be written
+if the next symbol is last symbol. This I think could become
+quite complicated and one can even consider the final length
+when its coverted to a file in ones planning of how to
+arrange the segments for minium length. There might be a
+payoff in encryption or when one is forced to squeeze last
+drop out. Such as trying to compress to a small fixed space.</p><p>
+ I feel this also leads to a better huffman set for the table
+than model I used above.</p><p>
+The normal conical model is.
+</p></h3>
+<pre>A 0000
+B 0001
+C 001
+D 010
+E 011
+F 100
+G 101
+H 11
+
+But one can see this not optimal. Better would be
+A = 0000
+B = 0001
+C = 001
+D = 011
+E = 111
+F = 010
+G = 110   
+H = 10
+</pre>
+<h3>
+Since more files end in H it should be shortest . By
+shortest when last symbol you only count distance to last one bit.
+Since A is all zeroes it can't be last byte. You need to
+pick repeat symbol. You could use any of them as the repeat.
+You could even see what the final output file would look like
+and choose B or C or F or H to position the last "one" when
+if occurs so that the conversion you select to make the fintely
+odd file a BYTE file that the one is chopped off. Like wise
+if the current ending would result in a 001 from the C character
+being such that the 1 bit is cut off. You give G that string
+and slide rest up to C so that your more apt to save a byte.<p>
+ One last comment if you know the last symbol of a file is
+always "X" then you always drop the last symbol of the file
+and compress normally and on decompression you add it in.
+
+
+
+ </p></h3>
+
+<center>
+<a href="https://web.archive.org/web/20210512085751/http://bijective.dogma.net/index.htm">ENTER here for MY Home Page</a><br>
+<!--
+<H3>Please Turn off JavaScript Active-x or any advanced features before entering</H3> </CENTER>
+-->
+
+
+
+</center></body></html>
+<!--
+     FILE ARCHIVED ON 08:57:51 May 12, 2021 AND RETRIEVED FROM THE
+     INTERNET ARCHIVE ON 00:52:32 Nov 26, 2024.
+     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
+
+     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
+     SECTION 108(a)(3)).
+-->
+<!--
+playback timings (ms):
+  captures_list: 0.63
+  exclusion.robots: 0.028
+  exclusion.robots.policy: 0.017
+  esindex: 0.012
+  cdx.remote: 6.951
+  LoadShardBlock: 68.831 (3)
+  PetaboxLoader3.datanode: 97.884 (4)
+  load_resource: 109.913
+  PetaboxLoader3.resolve: 51.361
+-->

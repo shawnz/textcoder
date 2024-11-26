@@ -1,0 +1,9 @@
+ Well actuall arb256 is for more than 256 symbols
+so here is the actually one for 256 symbols
+arb255,unarb255 for compress and uncompress of 256 symbols
+I'm leaving ar256 in so one can see how the tree is moded
+to make room for any number of symbols.
+Take Care
+Its dangerous stuff
+David Scott
+
