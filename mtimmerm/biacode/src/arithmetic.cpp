@@ -137,7 +137,7 @@ void ArithmeticEncoder::End()
     carrybuf = 0;
 }
 
-inline ArithmeticEncoder::ByteWithCarry(U32 outbyte)
+inline void ArithmeticEncoder::ByteWithCarry(U32 outbyte)
 {
     if (carrybuf)
     {

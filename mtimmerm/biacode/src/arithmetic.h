@@ -59,7 +59,7 @@ public:
 
 private:
     // produce a byte, managing carry propogation
-    ByteWithCarry(U32 byte);
+    void ByteWithCarry(U32 byte);
 
     // we write the finitely odd output number here
     std::ostream &bytesout;
