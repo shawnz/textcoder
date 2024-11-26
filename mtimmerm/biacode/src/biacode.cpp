@@ -190,7 +190,7 @@ static int Test()
                     outbits.End();
                 }
                 mid[outstr.pcount()] = 0;
-                istrstream instr(mid, outstr.pcount());
+                istrstream instr(mid, static_cast<int>(outstr.pcount()));
                 {
                     // decompress
                     FOBitIStream inbits(instr);
