@@ -4,15 +4,15 @@ class SimpleAdaptiveModel:
         self.sym_zero_index = 1
         while self.sym_zero_index < num_symbols:
             self.sym_zero_index *= 2
-        
+
         # Probability heap is twice the size
         self.prob_heap = [0] * (self.sym_zero_index * 2)
         self.prob1 = 0
-        
+
         # Initial probabilities
         for i in range(num_symbols):
             self.add_p(i, 1)
-        
+
         # Circular window for tracking recent symbols
         self.window = [-1] * 4096
         self.w0 = 0
@@ -24,12 +24,12 @@ class SimpleAdaptiveModel:
         # Circular buffer navigation and probability updates
         windows = [self.w1, self.w2, self.w3, self.w0]
         weights = [2, 1, 1, 2]
-        
+
         for i, (w, weight) in enumerate(zip(windows, weights)):
             w = (w - 1) % 4096
             if self.window[w] >= 0:
                 self.sub_p(self.window[w], weight)
-        
+
         self.w0 = (self.w0 - 1) % 4096
         self.window[self.w0] = symbol
         self.add_p(symbol, 6)
@@ -38,7 +38,7 @@ class SimpleAdaptiveModel:
         # Reset probabilities and window
         windows = [self.w0, self.w1, self.w2, self.w3]
         weights = [6, 4, 3, 2]
-        
+
         lim = 4095
         for w, weight in zip(windows, weights):
             curr = w

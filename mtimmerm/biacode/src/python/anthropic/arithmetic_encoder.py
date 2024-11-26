@@ -26,7 +26,9 @@ class ArithmeticEncoder:
         self.low += newl
 
         if self.next_free_end < self.low:
-            self.next_free_end = ((self.low + self.free_end_even) & ~self.free_end_even) | (self.free_end_even + 1)
+            self.next_free_end = (
+                (self.low + self.free_end_even) & ~self.free_end_even
+            ) | (self.free_end_even + 1)
 
         if self.range <= (self.BIT16 >> 1):
             self.low *= 2
@@ -36,13 +38,15 @@ class ArithmeticEncoder:
 
             while self.next_free_end - self.low >= self.range:
                 self.free_end_even //= 2
-                self.next_free_end = ((self.low + self.free_end_even) & ~self.free_end_even) | (self.free_end_even + 1)
+                self.next_free_end = (
+                    (self.low + self.free_end_even) & ~self.free_end_even
+                ) | (self.free_end_even + 1)
 
             # while self.interval_bits < 24:
 
             while True:
                 self.interval_bits += 1
-                if (self.interval_bits == 24):
+                if self.interval_bits == 24:
                     # need to output a byte
                     # adjust and output
                     new_low = self.low & ~self.MASK16
@@ -56,7 +60,7 @@ class ArithmeticEncoder:
 
                     self.byte_with_carry(new_low >> 16)
                     self.interval_bits -= 8
-            
+
                 if self.range > (self.BIT16 >> 1):
                     break
 
@@ -68,29 +72,31 @@ class ArithmeticEncoder:
         else:
             while self.next_free_end - self.low > self.range:
                 self.free_end_even //= 2
-                self.next_free_end = ((self.low + self.free_end_even) & ~self.free_end_even) | (self.free_end_even + 1)
+                self.next_free_end = (
+                    (self.low + self.free_end_even) & ~self.free_end_even
+                ) | (self.free_end_even + 1)
 
     def byte_with_carry(self, out_byte):
         if self.carry_buf:
             if out_byte >= 256:
                 self.bytesout.write(bytes([self.carry_byte + 1]))
                 for _ in range(self.carry_buf - 1):
-                    self.bytesout.write(b'\x00')
+                    self.bytesout.write(b"\x00")
                 self.carry_buf = 0
                 self.carry_byte = out_byte & 0xFF
             elif out_byte < 255:
                 self.bytesout.write(bytes([self.carry_byte]))
                 for _ in range(self.carry_buf - 1):
-                    self.bytesout.write(b'\xff')
+                    self.bytesout.write(b"\xff")
                 self.carry_buf = 0
                 self.carry_byte = out_byte & 0xFF
         else:
             self.carry_byte = out_byte & 0xFF
-        
+
         self.carry_buf += 1
 
     def end(self):
-        self.next_free_end <<= (24 - self.interval_bits)
+        self.next_free_end <<= 24 - self.interval_bits
 
         while self.next_free_end:
             self.byte_with_carry(self.next_free_end >> 16)
