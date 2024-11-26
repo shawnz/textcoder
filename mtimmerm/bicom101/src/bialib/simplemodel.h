@@ -17,37 +17,40 @@
 
 //===========================================================================
 //  ProbHeapModelBase: a base class for order0 models that use a probability
-//    heap 
+//    heap
 //===========================================================================
 
 class ProbHeapModelBase : public ArithmeticModel
-  {
-  public:
-  ProbHeapModelBase();
-  ~ProbHeapModelBase();
+{
+public:
+    ProbHeapModelBase();
+    ~ProbHeapModelBase();
 
-  public: //from ArithmeticModel
-  virtual void Encode(BYTE symbol,ArithmeticEncoder *dest);
-  virtual BYTE Decode(ArithmeticDecoder *src);
+public: // from ArithmeticModel
+    virtual void Encode(BYTE symbol, ArithmeticEncoder *dest);
+    virtual BYTE Decode(ArithmeticDecoder *src);
 
-  public:
-  //for incorporation into other models -- these ones don't update!
-  void Encode(BYTE symbol,ArithmeticEncoder *dest,ExclusionSet &excl);
-  BYTE Decode(ArithmeticDecoder *src,ExclusionSet &excl);
+public:
+    // for incorporation into other models -- these ones don't update!
+    void Encode(BYTE symbol, ArithmeticEncoder *dest, ExclusionSet &excl);
+    BYTE Decode(ArithmeticDecoder *src, ExclusionSet &excl);
 
-  virtual void Update(int symbol) = 0;
+    virtual void Update(int symbol) = 0;
 
-  protected:
-  void AddP(int symbol,unsigned n);
-  void SubP(int symbol,unsigned n);
-  unsigned SymP(int symbol)
-    {return(probheap[symzeroindex+symbol]);}
-  unsigned P1()
-    {return(probheap[1]);}
-  unsigned *probheap;
-  int symzeroindex;
-  };
-
+protected:
+    void AddP(int symbol, unsigned n);
+    void SubP(int symbol, unsigned n);
+    unsigned SymP(int symbol)
+    {
+        return (probheap[symzeroindex + symbol]);
+    }
+    unsigned P1()
+    {
+        return (probheap[1]);
+    }
+    unsigned *probheap;
+    int symzeroindex;
+};
 
 //===========================================================================
 //  SimpleAdaptiveModel : An adaptive order0 model that only remembers the
@@ -55,19 +58,18 @@ class ProbHeapModelBase : public ArithmeticModel
 //===========================================================================
 
 class SimpleAdaptiveModel : public ProbHeapModelBase
-  {
-  public:
-  SimpleAdaptiveModel();
+{
+public:
+    SimpleAdaptiveModel();
 
-  void Reset();
+    void Reset();
 
-  public: //from ProbHeapModelBase
-  void Update(int symbol);
+public: // from ProbHeapModelBase
+    void Update(int symbol);
 
-  private:
-  int window[4096],*w0,*w1,*w2,*w3;
-  };
-
+private:
+    int window[4096], *w0, *w1, *w2, *w3;
+};
 
 //===========================================================================
 //  SimpleDecayModel : An adaptive order0 model that decays old counts
@@ -75,12 +77,13 @@ class SimpleAdaptiveModel : public ProbHeapModelBase
 //===========================================================================
 
 class SimpleDecayModel : public ProbHeapModelBase
-  {
-  public:
-  SimpleDecayModel(unsigned inicounts=1,unsigned decayshift=8);
-  public: //from ProbHeapModelBase
-  void Update(int symbol);
-  unsigned m_decayshift;
-  };
+{
+public:
+    SimpleDecayModel(unsigned inicounts = 1, unsigned decayshift = 8);
+
+public: // from ProbHeapModelBase
+    void Update(int symbol);
+    unsigned m_decayshift;
+};
 
 #endif

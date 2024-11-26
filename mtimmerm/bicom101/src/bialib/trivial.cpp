@@ -16,85 +16,83 @@
 #include "trivial.h"
 
 bool TrivialFOEncoder::FillQ(IOByteQ *dest)
-  {
-  unsigned outlen=0;
-  unsigned blocktail=m_blocklen-1;
-  unsigned i;
-  BYTE c;
+{
+    unsigned outlen = 0;
+    unsigned blocktail = m_blocklen - 1;
+    unsigned i;
+    BYTE c;
 
-  while((outlen<256)&&(!m_done))
+    while ((outlen < 256) && (!m_done))
     {
-    outlen+=m_blocklen;
-    //do a block or end
-    if (m_in.AtEnd()) //ending
-      {
-      if (m_reserved0)
-        *(dest->Put(1))=(BYTE)128;
-      m_done=true;
-      break;
-      }
-    //output a block
-    c=m_in.Get();
-    *(dest->Put(1))=c;
-    if (m_reserved0)
-      m_reserved0=!(c&127);
-    else
-      m_reserved0=!c;
+        outlen += m_blocklen;
+        // do a block or end
+        if (m_in.AtEnd()) // ending
+        {
+            if (m_reserved0)
+                *(dest->Put(1)) = (BYTE)128;
+            m_done = true;
+            break;
+        }
+        // output a block
+        c = m_in.Get();
+        *(dest->Put(1)) = c;
+        if (m_reserved0)
+            m_reserved0 = !(c & 127);
+        else
+            m_reserved0 = !c;
 
-    for(i=blocktail;i;--i)
-      {
-      c=(m_in.AtEnd()?0:m_in.Get());
-      *(dest->Put(1))=c;
-      if (c)
-        m_reserved0=false;
-      }
+        for (i = blocktail; i; --i)
+        {
+            c = (m_in.AtEnd() ? 0 : m_in.Get());
+            *(dest->Put(1)) = c;
+            if (c)
+                m_reserved0 = false;
+        }
     }
-  return !m_done;
-  }
-
+    return !m_done;
+}
 
 bool TrivialFODecoder::FillQ(IOByteQ *dest)
-  {
-  unsigned outlen=0;
-  unsigned blocktail=m_blocklen-1;
-  unsigned i;
-  BYTE c;
+{
+    unsigned outlen = 0;
+    unsigned blocktail = m_blocklen - 1;
+    unsigned i;
+    BYTE c;
 
-  while((outlen<256)&&(!m_done))
+    while ((outlen < 256) && (!m_done))
     {
-    outlen+=m_blocklen;
-    //do a block or end
-    c=m_in.Get();
+        outlen += m_blocklen;
+        // do a block or end
+        c = m_in.Get();
 
-    if (m_reserved0)
-      {
-      if ((c==(BYTE)128)&&m_in.InTail())
+        if (m_reserved0)
         {
-        m_done=true;
-        break;
+            if ((c == (BYTE)128) && m_in.InTail())
+            {
+                m_done = true;
+                break;
+            }
+            *(dest->Put(1)) = c;
+            m_reserved0 = !(c & 127);
         }
-      *(dest->Put(1))=c;
-      m_reserved0=!(c&127);
-      }
-    else
-      {
-      if ((c==0)&&m_in.InTail())
+        else
         {
-        m_done=true;
-        break;
+            if ((c == 0) && m_in.InTail())
+            {
+                m_done = true;
+                break;
+            }
+            *(dest->Put(1)) = c;
+            m_reserved0 = !c;
         }
-      *(dest->Put(1))=c;
-      m_reserved0=!c;
-      }
 
-    for(i=blocktail;i;--i)
-      {
-      c=m_in.Get();
-      *(dest->Put(1))=c;
-      if (c)
-        m_reserved0=false;
-      }
+        for (i = blocktail; i; --i)
+        {
+            c = m_in.Get();
+            *(dest->Put(1)) = c;
+            if (c)
+                m_reserved0 = false;
+        }
     }
-  return !m_done;
-  }
-
+    return !m_done;
+}

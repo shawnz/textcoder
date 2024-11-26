@@ -16,7 +16,6 @@
 #ifndef wddstx1afsvbsxtpezmxgvut0q4ehncy
 #define wddstx1afsvbsxtpezmxgvut0q4ehncy
 
-
 #include "mtstream.h"
 
 //===========================================================================
@@ -25,85 +24,88 @@
 //===========================================================================
 
 class TrivialFOEncoder : public IOByteSource
-  {
-  public:
-  TrivialFOEncoder(unsigned blocklen=1)
+{
+public:
+    TrivialFOEncoder(unsigned blocklen = 1)
     {
-    m_blocklen=(blocklen?blocklen:1);
-    m_reserved0=m_done=false;
+        m_blocklen = (blocklen ? blocklen : 1);
+        m_reserved0 = m_done = false;
     }
-  TrivialFOEncoder
-    (IOByteSource *source,bool autodelete=false,unsigned blocklen=1)
+    TrivialFOEncoder(IOByteSource *source, bool autodelete = false, unsigned blocklen = 1)
     {
-    m_blocklen=(blocklen?blocklen:1);
-    m_reserved0=m_done=false;
-    SetSource(source,autodelete);
+        m_blocklen = (blocklen ? blocklen : 1);
+        m_reserved0 = m_done = false;
+        SetSource(source, autodelete);
     }
-  ~TrivialFOEncoder()
-    {Clear();}
-
-  void SetSource(IOByteSource *source,bool autodelete=false)
-    {Clear();m_in.SetSource(source,autodelete);}
-
-  void Clear()
+    ~TrivialFOEncoder()
     {
-    m_in.Clear();
-    m_reserved0=m_done=false;
+        Clear();
     }
 
-  public: //from IOByteSource
+    void SetSource(IOByteSource *source, bool autodelete = false)
+    {
+        Clear();
+        m_in.SetSource(source, autodelete);
+    }
 
-  virtual bool FillQ(IOByteQ *dest);
+    void Clear()
+    {
+        m_in.Clear();
+        m_reserved0 = m_done = false;
+    }
 
-  private:
-  ByteStream m_in;
-  unsigned m_blocklen,m_taillen;
-  BYTE m_tail[16];
-  bool m_reserved0,m_done;
-  };
+public: // from IOByteSource
+    virtual bool FillQ(IOByteQ *dest);
 
+private:
+    ByteStream m_in;
+    unsigned m_blocklen, m_taillen;
+    BYTE m_tail[16];
+    bool m_reserved0, m_done;
+};
 
 //===========================================================================
 //  TrivialFODecoder: Decode FO into byte blocks
 //===========================================================================
 
 class TrivialFODecoder : public IOByteSource
-  {
-  public:
-  TrivialFODecoder(unsigned blocklen=1)
+{
+public:
+    TrivialFODecoder(unsigned blocklen = 1)
     {
-    m_blocklen=(blocklen?blocklen:1);
-    m_reserved0=m_done=false;
+        m_blocklen = (blocklen ? blocklen : 1);
+        m_reserved0 = m_done = false;
     }
-  TrivialFODecoder
-    (IOByteSource *source,bool autodelete=false,unsigned blocklen=1)
+    TrivialFODecoder(IOByteSource *source, bool autodelete = false, unsigned blocklen = 1)
     {
-    m_blocklen=(blocklen?blocklen:1);
-    m_reserved0=m_done=false;
-    SetSource(source,autodelete);
+        m_blocklen = (blocklen ? blocklen : 1);
+        m_reserved0 = m_done = false;
+        SetSource(source, autodelete);
     }
-  ~TrivialFODecoder()
-    {Clear();}
-
-  void SetSource(IOByteSource *source,bool autodelete=false)
-    {Clear();m_in.SetSource(source,autodelete);}
-
-  void Clear()
+    ~TrivialFODecoder()
     {
-    m_in.Clear();
-    m_reserved0=m_done=false;
+        Clear();
     }
 
-  public: //from IOByteSource
+    void SetSource(IOByteSource *source, bool autodelete = false)
+    {
+        Clear();
+        m_in.SetSource(source, autodelete);
+    }
 
-  virtual bool FillQ(IOByteQ *dest);
+    void Clear()
+    {
+        m_in.Clear();
+        m_reserved0 = m_done = false;
+    }
 
-  private:
-  FOStream m_in;
-  unsigned m_blocklen;
-  bool m_reserved0,m_done;
-  };
+public: // from IOByteSource
+    virtual bool FillQ(IOByteQ *dest);
 
+private:
+    FOStream m_in;
+    unsigned m_blocklen;
+    bool m_reserved0, m_done;
+};
 
 #endif
-

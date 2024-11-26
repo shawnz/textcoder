@@ -15,132 +15,136 @@
 #include "mtstream.h"
 #include "string.h"
 
-
 //===========================================================================
 //  Rijndael: Block encrypt/decrypt.  Adapted from AES reference source
 //===========================================================================
 
 class Rijndael
-  {
-  public:
-  Rijndael()
+{
+public:
+    Rijndael()
     {
-    SetKey(0,0,true);  //default key
+        SetKey(0, 0, true); // default key
     }
 
-  Rijndael
-    (
-    const BYTE *key,unsigned keylen /*in bytes*/,bool dopasshash=false
-    )
+    Rijndael(
+        const BYTE *key, unsigned keylen /*in bytes*/, bool dopasshash = false)
     {
-    SetKey(key,keylen,dopasshash);
+        SetKey(key, keylen, dopasshash);
     }
 
-  void SetKey
-    (
-    const BYTE *key,unsigned keylen /*in bytes*/,bool dopasshash=false
-    );
+    void SetKey(
+        const BYTE *key, unsigned keylen /*in bytes*/, bool dopasshash = false);
 
-  //dest and src can be the same in these calls
-  void EncryptBlock(BYTE *dest,const BYTE *src,BYTE *cbcbuf=0); //16 bytes!!!
-  void DecryptBlock(BYTE *dest,const BYTE *src,BYTE *cbcbuf=0); //16 bytes!!!
+    // dest and src can be the same in these calls
+    void EncryptBlock(BYTE *dest, const BYTE *src, BYTE *cbcbuf = 0); // 16 bytes!!!
+    void DecryptBlock(BYTE *dest, const BYTE *src, BYTE *cbcbuf = 0); // 16 bytes!!!
 
-  private:
-  int ROUNDS;
-  enum{MAXKC=256/32,MAXKEYBYTES=MAXKC*4,MAXROUNDS=14};
-  int m_keybits;
-  bool m_isencryptkey;
-  BYTE m_key[MAXKEYBYTES];
-  BYTE m_roundkeys[MAXROUNDS+1][4][4];
+private:
+    int ROUNDS;
+    enum
+    {
+        MAXKC = 256 / 32,
+        MAXKEYBYTES = MAXKC * 4,
+        MAXROUNDS = 14
+    };
+    int m_keybits;
+    bool m_isencryptkey;
+    BYTE m_key[MAXKEYBYTES];
+    BYTE m_roundkeys[MAXROUNDS + 1][4][4];
 
-  void KeySched();
-  void EncToDecKey();
-  void DecToEncKey()
-    {KeySched();} //probably don't need to, but I didn't check
-  };
-
+    void KeySched();
+    void EncToDecKey();
+    void DecToEncKey()
+    {
+        KeySched();
+    } // probably don't need to, but I didn't check
+};
 
 //===========================================================================
 //  RijndaelFOEncrypt:  Bijectively encrypt an FO stream
 //===========================================================================
 
 class RijndaelFOEncrypt : public IOByteSource
-  {
-  public:
-  RijndaelFOEncrypt
-    (
-    const BYTE *key,unsigned keylen /*in bytes*/,bool dopasshash=false
-    )
-    :cipher(key,keylen,dopasshash)
+{
+public:
+    RijndaelFOEncrypt(
+        const BYTE *key, unsigned keylen /*in bytes*/, bool dopasshash = false)
+        : cipher(key, keylen, dopasshash)
     {
-    Clear();
+        Clear();
     }
-  ~RijndaelFOEncrypt()
-    {Clear();}
-
-  void SetSource(IOByteSource *source,bool autodelete=false)
-    {Clear();m_in.SetSource(source,autodelete);}
-
-  void Clear()
+    ~RijndaelFOEncrypt()
     {
-    m_in.Clear();
-    m_start=true;
-    m_done=false;
-    m_partiallen=0;
+        Clear();
     }
 
-  public: //from IOByteSource
+    void SetSource(IOByteSource *source, bool autodelete = false)
+    {
+        Clear();
+        m_in.SetSource(source, autodelete);
+    }
 
-  virtual bool FillQ(IOByteQ *dest);
+    void Clear()
+    {
+        m_in.Clear();
+        m_start = true;
+        m_done = false;
+        m_partiallen = 0;
+    }
 
-  private:
-  Rijndael cipher;
-  FOStream m_in;
-  unsigned m_partiallen;
-  bool m_start,m_done;
-  BYTE m_ivbuf[16],m_ivbuf2[16];
-  BYTE m_partial[32];
-  };
+public: // from IOByteSource
+    virtual bool FillQ(IOByteQ *dest);
+
+private:
+    Rijndael cipher;
+    FOStream m_in;
+    unsigned m_partiallen;
+    bool m_start, m_done;
+    BYTE m_ivbuf[16], m_ivbuf2[16];
+    BYTE m_partial[32];
+};
 
 //===========================================================================
 //  RijndaelFODecrypt:  Bijectively decrypt an FO stream
 //===========================================================================
 
 class RijndaelFODecrypt : public IOByteSource
-  {
-  public:
-  RijndaelFODecrypt
-    (
-    const BYTE *key,unsigned keylen /*in bytes*/,bool dopasshash=false
-    )
-    :cipher(key,keylen,dopasshash)
+{
+public:
+    RijndaelFODecrypt(
+        const BYTE *key, unsigned keylen /*in bytes*/, bool dopasshash = false)
+        : cipher(key, keylen, dopasshash)
     {
-    Clear();
+        Clear();
     }
-  ~RijndaelFODecrypt()
-    {Clear();}
-
-  void SetSource(IOByteSource *source,bool autodelete=false)
-    {Clear();m_in.SetSource(source,autodelete);}
-
-  void Clear()
+    ~RijndaelFODecrypt()
     {
-    m_in.Clear();
-    m_start=true;
-    m_done=false;
-    m_partiallen=0;
+        Clear();
     }
 
-  public: //from IOByteSource
+    void SetSource(IOByteSource *source, bool autodelete = false)
+    {
+        Clear();
+        m_in.SetSource(source, autodelete);
+    }
 
-  virtual bool FillQ(IOByteQ *dest);
+    void Clear()
+    {
+        m_in.Clear();
+        m_start = true;
+        m_done = false;
+        m_partiallen = 0;
+    }
 
-  private:
-  Rijndael cipher;
-  FOStream m_in;
-  unsigned m_partiallen;
-  bool m_start,m_done;
-  BYTE m_ivbuf[16],m_ivbuf2[16];
-  BYTE m_partial[32];
-  };
+public: // from IOByteSource
+    virtual bool FillQ(IOByteQ *dest);
 
+private:
+    Rijndael cipher;
+    FOStream m_in;
+    unsigned m_partiallen;
+    bool m_start, m_done;
+    BYTE m_ivbuf[16], m_ivbuf2[16];
+    BYTE m_partial[32];
+};
