@@ -38,7 +38,25 @@ class ArithmeticEncoder:
                 self.free_end_even //= 2
                 self.next_free_end = ((self.low + self.free_end_even) & ~self.free_end_even) | (self.free_end_even + 1)
 
-            while self.interval_bits < 24:
+            # while self.interval_bits < 24:
+
+            while True:
+                self.interval_bits += 1
+                if (self.interval_bits == 24):
+                    # need to output a byte
+                    # adjust and output
+                    new_low = self.low & ~self.MASK16
+                    self.low -= new_low
+                    self.next_free_end -= new_low
+
+                    # there can only be one number this even in the range.
+                    # nextfreeend is in the range
+                    # if nextfreeend is this even, next step must reduce evenness
+                    self.free_end_even &= self.MASK16
+
+                    self.byte_with_carry(new_low >> 16)
+                    self.interval_bits -= 8
+            
                 if self.range > (self.BIT16 >> 1):
                     break
 
@@ -46,7 +64,11 @@ class ArithmeticEncoder:
                 self.range *= 2
                 self.next_free_end *= 2
                 self.free_end_even = self.free_end_even * 2 + 1
-                self.interval_bits += 8
+                # self.interval_bits += 8
+        else:
+            while self.next_free_end - self.low > self.range:
+                self.free_end_even //= 2
+                self.next_free_end = ((self.low + self.free_end_even) & ~self.free_end_even) | (self.free_end_even + 1)
 
     def byte_with_carry(self, out_byte):
         if self.carry_buf:
@@ -54,11 +76,13 @@ class ArithmeticEncoder:
                 self.bytesout.write(bytes([self.carry_byte + 1]))
                 for _ in range(self.carry_buf - 1):
                     self.bytesout.write(b'\x00')
+                self.carry_buf = 0
                 self.carry_byte = out_byte & 0xFF
             elif out_byte < 255:
                 self.bytesout.write(bytes([self.carry_byte]))
                 for _ in range(self.carry_buf - 1):
                     self.bytesout.write(b'\xff')
+                self.carry_buf = 0
                 self.carry_byte = out_byte & 0xFF
         else:
             self.carry_byte = out_byte & 0xFF
