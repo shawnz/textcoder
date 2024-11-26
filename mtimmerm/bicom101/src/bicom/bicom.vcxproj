@@ -89,7 +89,8 @@
       <ProgramDataBaseFileName>.\Release\</ProgramDataBaseFileName>
     </ClCompile>
     <PostBuildEvent>
-      <Command>copy D:\proj\bicom\Release\bicom.exe c:\first32</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <Midl>
       <TypeLibraryName>.\Release\bicom.tlb</TypeLibraryName>
