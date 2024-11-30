@@ -19,11 +19,11 @@ class ArithmeticEncoder:
             else:
                 self.next_free_end = self.free_end_even + 1
 
-        newl, newh = model.get_sym_range(symbol)
-        newl = newl * self.range // model.prob_one()
-        newh = newh * self.range // model.prob_one()
-        self.range = newh - newl
-        self.low += newl
+        new_low, new_high = model.get_sym_range(symbol)
+        new_low = new_low * self.range // model.prob_one()
+        new_high = new_high * self.range // model.prob_one()
+        self.range = new_high - new_low
+        self.low += new_low
 
         if self.next_free_end < self.low:
             self.next_free_end = (
@@ -49,16 +49,16 @@ class ArithmeticEncoder:
                 if self.interval_bits == 24:
                     # need to output a byte
                     # adjust and output
-                    new_low = self.low & ~self.MASK16
-                    self.low -= new_low
-                    self.next_free_end -= new_low
+                    low_decrement = self.low & ~self.MASK16
+                    self.low -= low_decrement
+                    self.next_free_end -= low_decrement
 
                     # there can only be one number this even in the range.
                     # nextfreeend is in the range
                     # if nextfreeend is this even, next step must reduce evenness
                     self.free_end_even &= self.MASK16
 
-                    self.byte_with_carry(new_low >> 16)
+                    self.byte_with_carry(low_decrement >> 16)
                     self.interval_bits -= 8
 
                 if self.range > (self.BIT16 >> 1):

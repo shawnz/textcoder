@@ -56,12 +56,12 @@ class ArithmeticDecoder:
 
         symbol, sym_low, sym_high = model.get_symbol(p)
 
-        newl = sym_low * self.range // model.prob_one()
-        newh = sym_high * self.range // model.prob_one()
+        new_low = sym_low * self.range // model.prob_one()
+        new_high = sym_high * self.range // model.prob_one()
 
-        self.range = newh - newl
-        self.value -= newl << self.value_shift
-        self.low += newl
+        self.range = new_high - new_low
+        self.value -= new_low << self.value_shift
+        self.low += new_low
 
         # Adjust nextfreeend
         if self.next_free_end < self.low:
@@ -88,9 +88,9 @@ class ArithmeticDecoder:
                 self.interval_bits += 1
                 if self.interval_bits == 24:
                     # need to drop a byte
-                    new_low = self.low & ~self.MASK16
-                    self.low -= new_low
-                    self.next_free_end -= new_low
+                    low_decrement = self.low & ~self.MASK16
+                    self.low -= low_decrement
+                    self.next_free_end -= low_decrement
 
                     # there can only be one number this even in the range.
                     # nextfreeend is in the range
