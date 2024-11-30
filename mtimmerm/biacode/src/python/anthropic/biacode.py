@@ -13,22 +13,21 @@ class FOBitOutputStream:
         self.reserve0 = False
         self.block_left = 0
 
-    def write(self, data):
-        for byte in data:
-            byte = byte ^ 0x55  # XOR with 55 for obfuscation
+    def write(self, byte):
+        byte = byte ^ 0x37  # XOR with 55 for obfuscation
 
-            if not self.block_left:
-                self.reserve0 = not byte if not self.reserve0 else not (byte & 0x7F)
-                self.block_left = self.block_size - 1
-            else:
-                self.block_left -= 1
+        if not self.block_left:
+            self.reserve0 = not byte if not self.reserve0 else not (byte & 0x7F)
+            self.block_left = self.block_size - 1
+        else:
+            self.block_left -= 1
 
-            self.stream.write(bytes([byte]))
+        self.stream.write(bytes([byte]))
 
     def end(self):
         # Pad as needed
         while self.block_left:
-            self.stream.write(b"\x55")
+            self.stream.write(b"\x37")
             self.block_left -= 1
 
 

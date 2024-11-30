@@ -79,15 +79,15 @@ class ArithmeticEncoder:
     def byte_with_carry(self, out_byte):
         if self.carry_buf:
             if out_byte >= 256:
-                self.bytesout.write(bytes([self.carry_byte + 1]))
+                self.bytesout.write(self.carry_byte + 1)
                 for _ in range(self.carry_buf - 1):
-                    self.bytesout.write(b"\x00")
+                    self.bytesout.write(0x00)
                 self.carry_buf = 0
                 self.carry_byte = out_byte & 0xFF
             elif out_byte < 255:
-                self.bytesout.write(bytes([self.carry_byte]))
+                self.bytesout.write(self.carry_byte)
                 for _ in range(self.carry_buf - 1):
-                    self.bytesout.write(b"\xff")
+                    self.bytesout.write(0xFF)
                 self.carry_buf = 0
                 self.carry_byte = out_byte & 0xFF
         else:
