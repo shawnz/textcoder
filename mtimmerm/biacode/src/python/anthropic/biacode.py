@@ -40,35 +40,31 @@ class FOBitInputStream:
         self.block_left = 0
         self.in_done = False
 
-    def read(self, size=1):
-        if size != 1:
-            raise ValueError("This stream only supports reading 1 byte at a time")
-
-        while True:
-            if self.in_done:
-                return b"\x00"
-
-            byte = self.stream.read(1)
-            if not byte:
+    def read(self):
+        if self.in_done:
+            in_byte = 0
+        else:
+            data = self.stream.read(1)
+            if not data:
                 self.in_done = True
-                return b"\x00"
+                in_byte = 0
+            else:
+                in_byte = data[0] ^ 0x37  # XOR with 55 for de-obfuscation
 
-            byte = byte[0] ^ 0x55  # XOR with 55 for de-obfuscation
-
-            if self.block_left:
-                self.reserve0 = self.reserve0 and not byte
-                self.block_left -= 1
-                return bytes([byte])
-
-            # Start of a new block
-            if self.in_done:
-                if self.reserve0:
-                    return b"\x80"  # End marker
-                break
-
-            self.reserve0 = not byte if not self.reserve0 else not (byte & 0x7F)
-            self.block_left = self.block_size - 1
-            return bytes([byte])
+        if self.block_left:
+            self.reserve0 = self.reserve0 and not in_byte
+            self.block_left -= 1
+            return in_byte
+        
+        if self.in_done:
+            if self.reserve0:
+                self.reserve0 = False
+                return 0x80  # End marker
+            return -1
+        
+        self.reserve0 = not in_byte if not self.reserve0 else not (in_byte & 0x7F)
+        self.block_left = self.block_size - 1
+        return in_byte
 
 
 def compress(input_stream, output_stream, block_size=1):

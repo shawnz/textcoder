@@ -20,16 +20,22 @@ class ArithmeticDecoder:
             self.value <<= 8
             self.value_shift += 8
 
+            self.follow_buf -= 1
             if not self.follow_buf:
                 self.value |= self.follow_byte
 
                 # Refill follow buffer
-                try:
-                    self.follow_byte = self.bytesin.read(1)[0]
-                    self.follow_buf = 1
-                except (IndexError, TypeError):
-                    self.follow_buf = -1
-                    self.follow_byte = 0
+                while True:
+                    c_in = self.bytesin.read()
+                    if c_in < 0:
+                        self.follow_buf = -1
+                        break
+                    self.follow_buf += 1
+                    self.follow_byte = c_in & 0xFF
+                    
+                    if self.follow_byte:
+                        break
+
 
         # Check for end of stream
         if can_end:
@@ -44,11 +50,11 @@ class ArithmeticDecoder:
                 self.next_free_end = self.free_end_even + 1
 
         # Decode symbol
-        newl = (
+        p = (
             (self.value >> self.value_shift) * model.prob_one() + model.prob_one() - 1
         ) // self.range
 
-        symbol, sym_low, sym_high = model.get_symbol(newl)
+        symbol, sym_low, sym_high = model.get_symbol(p)
 
         newl = sym_low * self.range // model.prob_one()
         newh = sym_high * self.range // model.prob_one()
@@ -77,7 +83,21 @@ class ArithmeticDecoder:
                     (self.low + self.free_end_even) & ~self.free_end_even
                 ) | (self.free_end_even + 1)
 
-            while self.interval_bits < 24:
+            #while self.interval_bits < 24:
+            while True:
+                self.interval_bits += 1
+                if self.interval_bits == 24:
+                    # need to drop a byte
+                    new_low = self.low & ~self.MASK16
+                    self.low -= new_low
+                    self.next_free_end -= new_low
+
+                    # there can only be one number this even in the range.
+                    # nextfreeend is in the range
+                    # if nextfreeend is this even, next step must reduce evenness
+                    self.free_end_even &= self.MASK16
+                    self.interval_bits -= 8
+
                 if self.range > (self.BIT16 >> 1):
                     break
 
@@ -86,6 +106,12 @@ class ArithmeticDecoder:
                 self.next_free_end *= 2
                 self.free_end_even = self.free_end_even * 2 + 1
                 self.value_shift -= 1
-                self.interval_bits += 8
+                #self.interval_bits += 8
+        else:
+            while self.next_free_end - self.low > self.range:
+                self.free_end_even //= 2
+                self.next_free_end = (
+                    (self.low + self.free_end_even) & ~self.free_end_even
+                ) | (self.free_end_even + 1)
 
         return symbol
