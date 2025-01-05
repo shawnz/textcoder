@@ -15,37 +15,31 @@ class SimpleAdaptiveModel:
 
         # Circular window for tracking recent symbols
         self.window = [-1] * 4096
-        self.w0 = 0
-        self.w1 = 1024
-        self.w2 = 2048
-        self.w3 = 3072
+        self.indices = [1024, 2048, 3072, 0]
 
     def update(self, symbol):
         # Circular buffer navigation and probability updates
-        windows = [self.w1, self.w2, self.w3, self.w0]
         weights = [2, 1, 1, 2]
 
-        for i, (w, weight) in enumerate(zip(windows, weights)):
-            w = (w - 1) % 4096
-            if self.window[w] >= 0:
-                self.sub_p(self.window[w], weight)
+        for i in range(len(self.indices)):
+            self.indices[i] = (self.indices[i] - 1) % 4096
+            if self.window[self.indices[i]] >= 0:
+                self.sub_p(self.window[self.indices[i]], weights[i])
 
-        self.w0 = (self.w0 - 1) % 4096
-        self.window[self.w0] = symbol
+        self.window[self.indices[-1]] = symbol
         self.add_p(symbol, 6)
 
     def reset(self):
         # Reset probabilities and window
-        windows = [self.w0, self.w1, self.w2, self.w3]
         weights = [6, 4, 3, 2]
 
-        lim = 4095
-        for w, weight in zip(windows, weights):
-            curr = w
-            while curr != (w + 1024) % 4096:
+        for i in range(len(self.indices)):
+            j = (i + len(self.indices) - 1) % len(self.indices)
+            curr = self.indices[j]
+            while curr != self.indices[i]:
                 if self.window[curr] < 0:
                     break
-                self.sub_p(self.window[curr], weight)
+                self.sub_p(self.window[curr], weights[i])
                 self.window[curr] = -1
                 curr = (curr + 1) % 4096
 
