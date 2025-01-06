@@ -31,7 +31,7 @@ class FOBitOutputStream:
                 self.reserve0 = self.reserve0 and not self.seg_first
                 self.block_left -= 1
 
-            self.stream.write(bytes([self.seg_first ^ 0x37]))
+            self.stream.write(bytes([self.seg_first ^ 0x55]))
 
             for _ in range(self.seg_size - 1):
                 if not self.block_left:
@@ -39,7 +39,7 @@ class FOBitOutputStream:
                     self.block_left = self.block_size - 1
                 else:
                     self.block_left -= 1
-                self.stream.write(b"\x37")  # 0 ^ 0x55
+                self.stream.write(b"\x55")  # 0 ^ 0x55
 
             self.seg_first = byte
             self.seg_size = 1
@@ -51,7 +51,7 @@ class FOBitOutputStream:
         while True:
             while self.block_left > 0:
                 self.reserve0 = self.reserve0 and not self.seg_first
-                self.stream.write(bytes([self.seg_first ^ 0x37]))
+                self.stream.write(bytes([self.seg_first ^ 0x55]))
                 self.seg_first = 0
                 self.block_left -= 1
 
@@ -88,7 +88,7 @@ class FOBitInputStream:
                 self.in_done = True
                 in_byte = 0
             else:
-                in_byte = data[0] ^ 0x37  # XOR with 55 for de-obfuscation
+                in_byte = data[0] ^ 0x55  # XOR with 55 for de-obfuscation
 
         if self.block_left:
             self.reserve0 = self.reserve0 and not in_byte
