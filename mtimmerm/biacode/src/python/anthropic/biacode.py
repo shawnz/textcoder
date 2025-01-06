@@ -1,6 +1,5 @@
 import sys
 import argparse
-from io import BytesIO
 from arithmetic_decoder import ArithmeticDecoder
 from arithmetic_encoder import ArithmeticEncoder
 from simple_model import SimpleAdaptiveModel
@@ -12,23 +11,64 @@ class FOBitOutputStream:
         self.block_size = max(1, block_size)
         self.reserve0 = False
         self.block_left = 0
+        self.seg_size = 0
+        self.seg_first = 0
 
     def write(self, byte):
-        byte = byte ^ 0x37  # XOR with 55 for obfuscation
-
-        if not self.block_left:
-            self.reserve0 = not byte if not self.reserve0 else not (byte & 0x7F)
-            self.block_left = self.block_size - 1
+        if not self.seg_size:
+            self.seg_first = byte
+            self.seg_size = 1
+        elif byte == 0:
+            self.seg_size += 1
         else:
-            self.block_left -= 1
+            if not self.block_left:
+                if self.reserve0:
+                    self.reserve0 = not (self.seg_first & 0x7F)
+                else:
+                    self.reserve0 = not self.seg_first
+                self.block_left = self.block_size - 1
+            else:
+                self.reserve0 = self.reserve0 and not self.seg_first
+                self.block_left -= 1
 
-        self.stream.write(bytes([byte]))
+            self.stream.write(bytes([self.seg_first ^ 0x37]))
+
+            for _ in range(self.seg_size - 1):
+                if not self.block_left:
+                    self.reserve0 = True
+                    self.block_left = self.block_size - 1
+                else:
+                    self.block_left -= 1
+                self.stream.write(b"\x37")  # 0 ^ 0x55
+
+            self.seg_first = byte
+            self.seg_size = 1
 
     def end(self):
-        # Pad as needed
-        while self.block_left:
-            self.stream.write(b"\x37")
-            self.block_left -= 1
+        if not self.seg_size:
+            self.seg_first = 0
+
+        while True:
+            while self.block_left > 0:
+                self.reserve0 = self.reserve0 and not self.seg_first
+                self.stream.write(bytes([self.seg_first ^ 0x37]))
+                self.seg_first = 0
+                self.block_left -= 1
+
+            if self.reserve0:
+                assert self.seg_first != 0
+                if self.seg_first != 0x80:  # no end here
+                    self.reserve0 = False
+                    self.block_left = self.block_size
+                    continue
+            elif self.seg_first:  # no end here
+                self.block_left = self.block_size
+                continue
+            break
+
+        self.seg_size = 0
+        self.reserve0 = False
+        self.block_left = 0
 
 
 class FOBitInputStream:
@@ -54,21 +94,25 @@ class FOBitInputStream:
             self.reserve0 = self.reserve0 and not in_byte
             self.block_left -= 1
             return in_byte
-        
+
         if self.in_done:
             if self.reserve0:
                 self.reserve0 = False
                 return 0x80  # End marker
             return -1
-        
-        self.reserve0 = not in_byte if not self.reserve0 else not (in_byte & 0x7F)
+
+        if self.reserve0:
+            self.reserve0 = not (in_byte & 0x7F)
+        else:
+            self.reserve0 = not in_byte
         self.block_left = self.block_size - 1
         return in_byte
 
 
 def compress(input_stream, output_stream, block_size=1):
     model = SimpleAdaptiveModel(256)
-    encoder = ArithmeticEncoder(FOBitOutputStream(output_stream, block_size))
+    outbits = FOBitOutputStream(output_stream, block_size)
+    encoder = ArithmeticEncoder(outbits)
 
     while True:
         byte = input_stream.read(1)
@@ -80,6 +124,7 @@ def compress(input_stream, output_stream, block_size=1):
         model.update(sym)
 
     encoder.end()
+    outbits.end()
 
 
 def decompress(input_stream, output_stream, block_size=1):
