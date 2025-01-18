@@ -12,6 +12,9 @@ jupyter = "^1.0.0"
 numpy = "^1.26.4"
 sympy = "^1.12"
 matplotlib = "^3.8.3"
+transformers = "^4.47.1"
+torch = "^2.5.1"
+accelerate = "^1.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
