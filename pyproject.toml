@@ -15,6 +15,10 @@ matplotlib = "^3.8.3"
 transformers = "^4.47.1"
 torch = "^2.5.1"
 accelerate = "^1.2.1"
+protobuf = "^5.29.3"
+tiktoken = "^0.8.0"
+blobfile = "^3.0.0"
+cryptography = "^44.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
