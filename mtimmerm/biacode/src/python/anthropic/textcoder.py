@@ -90,6 +90,10 @@ def decompress(input_stream, block_size=1):
             break
         print(f"{time.time()}: token {sym} has text {repr(tokenizer.decode([sym]))}")
 
+        print(
+            f"{time.time()}: ingested {input_stream.tell()} bytes of {len(input_stream.getvalue())}"
+        )
+
         output_toks.append(sym)
         print(
             f"{time.time()}: complete output so far: {repr(tokenizer.decode(output_toks))}"
