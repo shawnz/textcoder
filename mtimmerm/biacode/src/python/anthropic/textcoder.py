@@ -95,19 +95,21 @@ def main():
 
     password = b"password"
     # plaintext = b"what if the string is really long? hello goodbye"
-    plaintext = b"plaintext"
+    plaintext = b"hello world"
     associated_data = None
-    # salt = os.urandom(16)
-    salt = bytes.fromhex("57822ab590c8d4a08fcef398e810fd9a")
+    salt = os.urandom(16)
+    #salt = bytes.fromhex("57822ab590c8d4a08fcef398e810fd9a")
     # nonce = os.urandom(12)
-    nonce = bytes.fromhex("3462db465be6182e7a285149")
+    # nonce = bytes.fromhex("3462db465be6182e7a285149")
+    nonce = salt[:12]
 
     kdf = Argon2id(salt=salt, length=32, iterations=1, lanes=4, memory_cost=64 * 1024)
     key = kdf.derive(password)
 
     aesgcmsiv = AESGCMSIV(key)
     ct = aesgcmsiv.encrypt(nonce, plaintext, associated_data)
-    input_bytes = salt + nonce + ct
+    # input_bytes = salt + nonce + ct
+    input_bytes = salt + ct
 
     print(f"input_bytes=0x{input_bytes.hex()}")
 
@@ -139,9 +141,13 @@ def main():
     kdf = Argon2id(salt=salt, length=32, iterations=1, lanes=4, memory_cost=64 * 1024)
     key = kdf.derive(password)
 
-    nonce = output_bytes[16:28]
+    # nonce = output_bytes[16:28]
+    nonce = output_bytes[:12]
     aesgcmsiv = AESGCMSIV(key)
-    decoded_bytes = aesgcmsiv.decrypt(nonce, output_bytes[28:], associated_data)
+
+    # ct = output_bytes[28:]
+    ct = output_bytes[16:]
+    decoded_bytes = aesgcmsiv.decrypt(nonce, ct, associated_data)
 
     decoded = decoded_bytes.decode("utf-8")
 
