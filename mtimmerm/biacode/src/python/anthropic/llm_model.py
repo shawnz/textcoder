@@ -22,7 +22,7 @@ class LLMModel:
         # )
         print(f"{time.time()}: started initial forward pass")
         self._logits = model(
-            **initial_input, past_key_values=self._past_key_values
+            input_ids=initial_input, past_key_values=self._past_key_values
         ).logits[0, -1]
         print(f"{time.time()}: done initial forward pass")
         self._probs_dirty = True
