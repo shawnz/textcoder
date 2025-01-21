@@ -93,9 +93,13 @@ class LLMModel:
     def get_sym_range(self, symbol):
         if self._sorted_tok_ids_dirty:
             self._recompute_sorted_tok_ids()
-        idx = self._sorted_tok_id_indices[
-            torch.searchsorted(self._sorted_tok_ids, symbol)
-        ]
+        sorted_idx = torch.searchsorted(self._sorted_tok_ids, symbol)
+        if (
+            sorted_idx >= len(self._sorted_tok_ids)
+            or self._sorted_tok_ids[sorted_idx] != symbol
+        ):
+            raise ValueError(f"symbol {symbol} not permitted at this time")
+        idx = self._sorted_tok_id_indices[sorted_idx]
         low = self._probs[idx - 1].item() if idx > 0 else 0
         high = self._probs[idx].item()
         return low, high
