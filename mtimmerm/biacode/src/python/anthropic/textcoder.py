@@ -13,7 +13,19 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCMSIV
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 
 _MODEL = "meta-llama/Llama-3.2-1B-Instruct"
-_PROMPT = "You are a Twitter user, about to post a tweet. What does the tweet say? Please respond with just the tweet contents with no quotes."
+_PROMPT = [
+    {
+        "role": "system",
+        "content": "Write a tweet in the style of a typical Twitter user. Respond with only the exact contents of the tweet and nothing more.",
+        #         "content": """\
+        # You are a tweet authoring system which helps users to author tweets on \
+        # Twitter. When the user requests that you write a tweet, respond only with \
+        # the tweet contents exactly as the user would input them into Twitter. Don't \
+        # include quotation marks or any other extraneous text other than the contents \
+        # of the tweet.""",
+    },
+    # {"role": "user", "content": "Write a tweet for me about sports, the weather, or politics"},
+]
 
 
 def compress(input_stream, output_stream, block_size=1):
@@ -21,7 +33,9 @@ def compress(input_stream, output_stream, block_size=1):
     model = AutoModelForCausalLM.from_pretrained(
         _MODEL, torch_dtype="auto", device_map="auto"
     )
-    initial_input = tokenizer(_PROMPT, return_tensors="pt").to(model.device)
+    initial_input = tokenizer.apply_chat_template(
+        _PROMPT, add_generation_prompt=True, return_tensors="pt"
+    ).to(model.device)
     model = LLMModel(model, initial_input, list(tokenizer.added_tokens_decoder.keys()))
     outbits = FOBitOutputStream(output_stream, block_size)
     encoder = ArithmeticEncoder(outbits)
@@ -59,7 +73,9 @@ def decompress(input_stream, block_size=1):
     model = AutoModelForCausalLM.from_pretrained(
         _MODEL, torch_dtype="auto", device_map="auto"
     )
-    initial_input = tokenizer(_PROMPT, return_tensors="pt").to(model.device)
+    initial_input = tokenizer.apply_chat_template(
+        _PROMPT, add_generation_prompt=True, return_tensors="pt"
+    ).to(model.device)
     model = LLMModel(model, initial_input, list(tokenizer.added_tokens_decoder.keys()))
     decoder = ArithmeticDecoder(FOBitInputStream(input_stream, block_size))
 
