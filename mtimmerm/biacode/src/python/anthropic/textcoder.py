@@ -16,7 +16,7 @@ _MODEL = "meta-llama/Llama-3.2-1B-Instruct"
 _PROMPT = [
     {
         "role": "system",
-        "content": "Write a tweet in the style of a typical Twitter user. Respond with only the exact contents of the tweet and nothing more.",
+        "content": "You are a typical Twitter user. Respond with your tweet.",
     },
 ]
 
@@ -41,7 +41,7 @@ def compress(input_stream, output_stream, block_size=1):
             continue
 
         print(
-            f"{time.time()}: encoding token {input_token} ({repr(tokenizer.decode([input_token]))}, #{i} of {len(input_tokens)})"
+            f"{time.time()}: encoding token {input_token} ({repr(tokenizer.decode([input_token]))}, #{i+1} of {len(input_tokens.input_ids)})"
         )
         encoder.encode(model, input_token, True)
         print(
