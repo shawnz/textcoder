@@ -17,14 +17,7 @@ _PROMPT = [
     {
         "role": "system",
         "content": "Write a tweet in the style of a typical Twitter user. Respond with only the exact contents of the tweet and nothing more.",
-        #         "content": """\
-        # You are a tweet authoring system which helps users to author tweets on \
-        # Twitter. When the user requests that you write a tweet, respond only with \
-        # the tweet contents exactly as the user would input them into Twitter. Don't \
-        # include quotation marks or any other extraneous text other than the contents \
-        # of the tweet.""",
     },
-    # {"role": "user", "content": "Write a tweet for me about sports, the weather, or politics"},
 ]
 
 
@@ -107,20 +100,12 @@ def decompress(input_stream, block_size=1):
 def main():
     print(f"{time.time()}: started script")
 
-    #torch.use_deterministic_algorithms(True)
-    #torch.manual_seed(0)
-    #random.seed(0)
-
     torch.mps.empty_cache()
 
     password = b"password"
-    # plaintext = b"what if the string is really long? hello goodbye"
     plaintext = b"hello world"
     associated_data = None
     salt = os.urandom(16)
-    #salt = bytes.fromhex("57822ab590c8d4a08fcef398e810fd9a")
-    # nonce = os.urandom(12)
-    # nonce = bytes.fromhex("3462db465be6182e7a285149")
     nonce = salt[:12]
 
     kdf = Argon2id(salt=salt, length=32, iterations=1, lanes=4, memory_cost=64 * 1024)
@@ -128,7 +113,6 @@ def main():
 
     aesgcmsiv = AESGCMSIV(key)
     ct = aesgcmsiv.encrypt(nonce, plaintext, associated_data)
-    # input_bytes = salt + nonce + ct
     input_bytes = salt + ct
 
     print(f"input_bytes=0x{input_bytes.hex()}")
@@ -161,11 +145,9 @@ def main():
     kdf = Argon2id(salt=salt, length=32, iterations=1, lanes=4, memory_cost=64 * 1024)
     key = kdf.derive(password)
 
-    # nonce = output_bytes[16:28]
     nonce = output_bytes[:12]
     aesgcmsiv = AESGCMSIV(key)
 
-    # ct = output_bytes[28:]
     ct = output_bytes[16:]
     decoded_bytes = aesgcmsiv.decrypt(nonce, ct, associated_data)
 
