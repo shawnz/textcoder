@@ -2,6 +2,7 @@ import io
 import time
 import os
 import random
+import gc
 
 from arithmetic_decoder import ArithmeticDecoder
 from arithmetic_encoder import ArithmeticEncoder
@@ -19,6 +20,14 @@ _PROMPT = [
         "content": "You are a typical Twitter user. Respond with your tweet.",
     },
 ]
+
+# def _empty_cache(device_type: str):
+#     if device_type == "cuda":
+#         torch.cuda.empty_cache()
+#     elif device_type == "mps":
+#         torch.mps.empty_cache()
+#     elif device_type == "xpu":
+#         torch.xpu.empty_cache()
 
 
 def compress(input_stream, output_stream, block_size=1):
@@ -100,7 +109,7 @@ def decompress(input_stream, block_size=1):
 def main():
     print(f"{time.time()}: started script")
 
-    torch.mps.empty_cache()
+    # torch.mps.empty_cache()
 
     password = b"password"
     plaintext = b"hello world"
@@ -122,7 +131,8 @@ def main():
     print(f"input_bytes=0x{input_bytes.hex()}")
     print(f"{output_toks=}")
 
-    torch.mps.empty_cache()
+    # torch.mps.empty_cache()
+    gc.collect()
 
     print(f"{time.time()}: decompressed input")
 
