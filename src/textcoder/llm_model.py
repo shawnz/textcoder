@@ -34,8 +34,8 @@ class LLMModel:
                 topk_logit_indices,
             )
 
-        # fit probabilities into _TARGET_PROB_ONE integer
-        # buckets with the following approach:
+        # fit probabilities into _TARGET_PROB_ONE integer buckets with the
+        # following approach:
         #
         # 1. multiply probabilities by _TARGET_PROB_ONE
         # 2. round up result and cast to integer
