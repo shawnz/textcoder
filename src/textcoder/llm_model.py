@@ -17,8 +17,12 @@ class LLMModel:
         self._sorted_tok_ids_dirty = True
 
     def _recompute_probs(self):
+        # filter out special tokens
         filtered_logits = self._logits
         filtered_logits[self._special_token_ids] = float("-inf")
+
+        # convert logits to probabilities with softmax, sort probabilities to
+        # allow for efficient searching, and optionally apply top K sampling
         if _TOP_K == 0:
             sorted_decimal_probs, sorted_decimal_prob_indices = torch.sort(
                 torch.softmax(filtered_logits, dim=0), descending=True
@@ -29,6 +33,14 @@ class LLMModel:
                 torch.softmax(topk_logits, dim=0),
                 topk_logit_indices,
             )
+
+        # fit probabilities into _TARGET_PROB_ONE integer
+        # buckets with the following approach:
+        #
+        # 1. multiply probabilities by _TARGET_PROB_ONE
+        # 2. round up result and cast to integer
+        # 3. calculate cumulative sum and truncate once _TARGET_PROB_ONE is
+        #    exceeded
         scaled_int_probs = torch.ceil(sorted_decimal_probs * _TARGET_PROB_ONE).int()
         cumsum_probs = torch.cumsum(scaled_int_probs, dim=0)
         truncation_point = torch.searchsorted(cumsum_probs, _TARGET_PROB_ONE)
@@ -39,6 +51,8 @@ class LLMModel:
     def _recompute_sorted_tok_ids(self):
         if self._probs_dirty:
             self._recompute_probs()
+
+        # sort token IDs for efficient searching when encoding
         self._sorted_tok_ids, self._sorted_tok_id_indices = torch.sort(
             self._prob_tok_ids
         )
@@ -60,6 +74,12 @@ class LLMModel:
             sorted_idx >= len(self._sorted_tok_ids)
             or self._sorted_tok_ids[sorted_idx] != symbol
         ):
+            # symbol is not present in tok_ids: this could be because it was
+            # eliminated during top-K sampling or truncation, or it's a
+            # special token, etc.
+            #
+            # this can happen when the tokenizer tokenizes a string
+            # differently than how we encoded it.
             raise ValueError(f"symbol {symbol} not permitted at this time")
         idx = self._sorted_tok_id_indices[sorted_idx]
         low = self._probs[idx - 1].item() if idx > 0 else 0
