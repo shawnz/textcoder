@@ -42,8 +42,6 @@ class ArithmeticEncoder:
                     (self.low + self.free_end_even) & ~self.free_end_even
                 ) | (self.free_end_even + 1)
 
-            # while self.interval_bits < 24:
-
             while True:
                 self.interval_bits += 1
                 if self.interval_bits == 24:
@@ -68,7 +66,6 @@ class ArithmeticEncoder:
                 self.range *= 2
                 self.next_free_end *= 2
                 self.free_end_even = self.free_end_even * 2 + 1
-                # self.interval_bits += 8
         else:
             while self.next_free_end - self.low > self.range:
                 self.free_end_even //= 2

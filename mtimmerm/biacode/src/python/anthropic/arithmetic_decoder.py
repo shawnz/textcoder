@@ -32,10 +32,9 @@ class ArithmeticDecoder:
                         break
                     self.follow_buf += 1
                     self.follow_byte = c_in & 0xFF
-                    
+
                     if self.follow_byte:
                         break
-
 
         # Check for end of stream
         if can_end:
@@ -83,7 +82,6 @@ class ArithmeticDecoder:
                     (self.low + self.free_end_even) & ~self.free_end_even
                 ) | (self.free_end_even + 1)
 
-            #while self.interval_bits < 24:
             while True:
                 self.interval_bits += 1
                 if self.interval_bits == 24:
@@ -106,7 +104,6 @@ class ArithmeticDecoder:
                 self.next_free_end *= 2
                 self.free_end_even = self.free_end_even * 2 + 1
                 self.value_shift -= 1
-                #self.interval_bits += 8
         else:
             while self.next_free_end - self.low > self.range:
                 self.free_end_even //= 2

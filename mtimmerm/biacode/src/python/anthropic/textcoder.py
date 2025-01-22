@@ -1,17 +1,14 @@
 import io
-import time
 import os
-import random
-import gc
+import time
 
 from arithmetic_decoder import ArithmeticDecoder
 from arithmetic_encoder import ArithmeticEncoder
+from cryptography.hazmat.primitives.ciphers.aead import AESGCMSIV
+from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 from foio import FOBitInputStream, FOBitOutputStream
 from llm_model import LLMModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
-from cryptography.hazmat.primitives.ciphers.aead import AESGCMSIV
-from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
 
 _MODEL = "meta-llama/Llama-3.2-1B-Instruct"
 _PROMPT = [
@@ -20,14 +17,6 @@ _PROMPT = [
         "content": "You are a typical Twitter user. Respond with your tweet.",
     },
 ]
-
-# def _empty_cache(device_type: str):
-#     if device_type == "cuda":
-#         torch.cuda.empty_cache()
-#     elif device_type == "mps":
-#         torch.mps.empty_cache()
-#     elif device_type == "xpu":
-#         torch.xpu.empty_cache()
 
 
 def compress(input_stream, output_stream, block_size=1):
@@ -50,7 +39,7 @@ def compress(input_stream, output_stream, block_size=1):
             continue
 
         print(
-            f"{time.time()}: encoding token {input_token} ({repr(tokenizer.decode([input_token]))}, #{i+1} of {len(input_tokens.input_ids)})"
+            f"{time.time()}: encoding token {input_token} ({repr(tokenizer.decode([input_token]))}, #{i + 1} of {len(input_tokens.input_ids)})"
         )
         encoder.encode(model, input_token, True)
         print(
@@ -109,8 +98,6 @@ def decompress(input_stream, block_size=1):
 def main():
     print(f"{time.time()}: started script")
 
-    # torch.mps.empty_cache()
-
     password = b"password"
     plaintext = b"hello world"
     associated_data = None
@@ -130,9 +117,6 @@ def main():
 
     print(f"input_bytes=0x{input_bytes.hex()}")
     print(f"{output_toks=}")
-
-    # torch.mps.empty_cache()
-    gc.collect()
 
     print(f"{time.time()}: decompressed input")
 

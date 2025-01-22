@@ -1,9 +1,10 @@
-import sys
 import argparse
+import sys
+
 from arithmetic_decoder import ArithmeticDecoder
 from arithmetic_encoder import ArithmeticEncoder
-from simple_model import SimpleAdaptiveModel
 from foio import FOBitInputStream, FOBitOutputStream
+from simple_model import SimpleAdaptiveModel
 
 
 def compress(input_stream, output_stream, block_size=1):
