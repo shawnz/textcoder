@@ -4,7 +4,7 @@ import torch
 import transformers
 
 _TARGET_PROB_ONE = 32768
-_TOP_K = 40
+_TOP_K = 100
 
 
 class LLMModel:
