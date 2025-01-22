@@ -4,20 +4,13 @@ version = "0.1.0"
 description = ""
 authors = ["Shawn Zivontsis <shawnz@shawnz.org>"]
 readme = "README.md"
-package-mode = false
+packages = [{include = "textcoder", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-jupyter = "^1.0.0"
-numpy = "^1.26.4"
-sympy = "^1.12"
-matplotlib = "^3.8.3"
 transformers = "^4.47.1"
 torch = "^2.5.1"
 accelerate = "^1.2.1"
-protobuf = "^5.29.3"
-tiktoken = "^0.8.0"
-blobfile = "^3.0.0"
 cryptography = "^44.0.0"
 
 

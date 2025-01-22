@@ -2,13 +2,14 @@ import io
 import os
 import time
 
-from arithmetic_decoder import ArithmeticDecoder
-from arithmetic_encoder import ArithmeticEncoder
 from cryptography.hazmat.primitives.ciphers.aead import AESGCMSIV
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
-from foio import FOBitInputStream, FOBitOutputStream
-from llm_model import LLMModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
+
+from textcoder.arithmetic_decoder import ArithmeticDecoder
+from textcoder.arithmetic_encoder import ArithmeticEncoder
+from textcoder.foio import FOBitInputStream, FOBitOutputStream
+from textcoder.llm_model import LLMModel
 
 _MODEL = "meta-llama/Llama-3.2-1B-Instruct"
 _PROMPT = [
