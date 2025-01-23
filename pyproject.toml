@@ -4,7 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Shawn Zivontsis <shawnz@shawnz.org>"]
 readme = "README.md"
-packages = [{include = "textcoder", from="src"}]
+packages = [{ include = "textcoder", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.10"
@@ -12,10 +12,6 @@ transformers = "^4.47.1"
 torch = "^2.5.1"
 accelerate = "^1.2.1"
 cryptography = "^44.0.0"
-
-
-[tool.poetry.group.dev.dependencies]
-pandas = "^2.2.2"
 
 [build-system]
 requires = ["poetry-core"]
