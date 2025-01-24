@@ -51,6 +51,8 @@ cat encoded.txt | textcoder -d -p '<password>'
 
 The Llama tokenizer used in this project sometimes permits multiple possible tokenizations for a given string. As a result, it is sometimes the case that the arithmetic coder produces a series of tokens which don't match the canonical tokenization for that string exactly. In these cases, decoding will fail and you may need to try to run the encoding process again.
 
+To mitigate this, the encoder will try decoding the output before returning it. This validation step requires extra time and memory usage. To skip validation, use the `-n` (`--no-validate`) parameter.
+
 ## Acknowledgements
 
 This project wouldn't have been possible without the work of Matt Timmermans and his [Bijective Arithmetic Coding algorithm](https://web.archive.org/web/20210901195459/http://www3.sympatico.ca/mt0000/biacode/). The bijective arithmetic coding algorithm is necessary to be able to decompress arbitrary bit streams. Matt Timmermans' code was ported to Python with the assistance of Anthropic's Claude 3.5 Sonnet for inclusion in this project.
