@@ -38,13 +38,13 @@ huggingface-cli login
 Finally, you can now run Textcoder using the `textcoder` command. To encode a message, run:
 
 ```bash
-echo '<message>' | textcoder -p '<password>' > encoded.txt
+echo '<message>' | poetry run textcoder -p '<password>' > encoded.txt
 ```
 
 To decode a message, run:
 
 ```bash
-cat encoded.txt | textcoder -d -p '<password>'
+cat encoded.txt | poetry run textcoder -d -p '<password>'
 ```
 
 ## Known Issues
