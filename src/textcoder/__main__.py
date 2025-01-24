@@ -1,3 +1,3 @@
-import textcoder.textcoder
+import textcoder.cli
 
-textcoder.textcoder.main()
+textcoder.cli.main()

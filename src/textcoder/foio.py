@@ -1,5 +1,8 @@
+import typing
+
+
 class FOBitOutputStream:
-    def __init__(self, stream, block_size=1):
+    def __init__(self, stream: typing.BinaryIO, block_size: int = 1):
         self.stream = stream
         self.block_size = max(1, block_size)
         self.reserve0 = False
@@ -7,7 +10,7 @@ class FOBitOutputStream:
         self.seg_size = 0
         self.seg_first = 0
 
-    def write(self, byte):
+    def write(self, byte: int):
         if not self.seg_size:
             self.seg_first = byte
             self.seg_size = 1
@@ -65,7 +68,7 @@ class FOBitOutputStream:
 
 
 class FOBitInputStream:
-    def __init__(self, stream, block_size=1):
+    def __init__(self, stream: typing.BinaryIO, block_size: int = 1):
         self.stream = stream
         self.block_size = max(1, block_size)
         self.reserve0 = False

@@ -5,12 +5,17 @@ _TARGET_PROB_ONE = 32768
 _TOP_K = 100
 
 
-class LLMModel:
-    def __init__(self, model, initial_input, special_token_ids):
-        self._model = model
+class LLMArithmeticModel:
+    def __init__(
+        self,
+        hf_model: transformers.PreTrainedModel,
+        initial_input: list[int],
+        special_token_ids: list[int],
+    ):
+        self._model = hf_model
         self._special_token_ids = special_token_ids
         self._past_key_values = transformers.DynamicCache()
-        self._logits = model(
+        self._logits = hf_model(
             input_ids=initial_input, past_key_values=self._past_key_values
         ).logits[0, -1]
         self._probs_dirty = True
@@ -58,42 +63,42 @@ class LLMModel:
         )
         self._sorted_tok_ids_dirty = False
 
-    def update(self, token):
+    def update(self, token_id: int):
         self._logits = self._model(
-            input_ids=torch.tensor([[token]], device=self._model.device),
+            input_ids=torch.tensor([[token_id]], device=self._model.device),
             past_key_values=self._past_key_values,
         ).logits[0, -1]
         self._probs_dirty = True
         self._sorted_tok_ids_dirty = True
 
-    def get_sym_range(self, symbol):
+    def get_sym_range(self, token_id: int) -> tuple[int, int]:
         if self._sorted_tok_ids_dirty:
             self._recompute_sorted_tok_ids()
-        sorted_idx = torch.searchsorted(self._sorted_tok_ids, symbol)
+        sorted_idx = torch.searchsorted(self._sorted_tok_ids, token_id)
         if (
             sorted_idx >= len(self._sorted_tok_ids)
-            or self._sorted_tok_ids[sorted_idx] != symbol
+            or self._sorted_tok_ids[sorted_idx] != token_id
         ):
-            # symbol is not present in tok_ids: this could be because it was
+            # token_id is not present in tok_ids: this could be because it was
             # eliminated during top-K sampling or truncation, or it's a
             # special token, etc.
             #
             # this can happen when the tokenizer tokenizes a string
             # differently than how we encoded it.
-            raise ValueError(f"symbol {symbol} not permitted at this time")
+            raise ValueError(f"token id {token_id} not permitted at this time")
         idx = self._sorted_tok_id_indices[sorted_idx]
         low = self._probs[idx - 1].item() if idx > 0 else 0
         high = self._probs[idx].item()
-        return low, high
+        return low, high # type: ignore
 
-    def get_symbol(self, p):
+    def get_symbol(self, p: int) -> tuple[int, int, int]:
         if self._probs_dirty:
             self._recompute_probs()
         idx = torch.searchsorted(self._probs, p + 1)
-        symbol = self._prob_tok_ids[idx].item()
+        token_id = self._prob_tok_ids[idx].item()
         low = self._probs[idx - 1].item() if idx > 0 else 0
         high = self._probs[idx].item()
-        return symbol, low, high
+        return token_id, low, high # type: ignore
 
-    def prob_one(self):
+    def prob_one(self) -> int:
         return _TARGET_PROB_ONE

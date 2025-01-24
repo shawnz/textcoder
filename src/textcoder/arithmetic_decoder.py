@@ -1,8 +1,14 @@
+import typing
+
+from textcoder.foio import FOBitInputStream
+from textcoder.model import LLMArithmeticModel
+
+
 class ArithmeticDecoder:
     BIT16 = 65536
     MASK16 = 0xFFFF
 
-    def __init__(self, input_stream):
+    def __init__(self, input_stream: FOBitInputStream):
         self.bytesin = input_stream
         self.low = 0
         self.range = self.BIT16
@@ -14,7 +20,7 @@ class ArithmeticDecoder:
         self.follow_byte = 0
         self.follow_buf = 1
 
-    def decode(self, model, can_end=False):
+    def decode(self, model: LLMArithmeticModel, can_end: bool = False) -> int:
         # Refill value buffer
         while self.value_shift <= 0:
             self.value <<= 8

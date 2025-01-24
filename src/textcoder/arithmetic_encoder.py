@@ -1,8 +1,14 @@
+import typing
+
+from textcoder.foio import FOBitOutputStream
+from textcoder.model import LLMArithmeticModel
+
+
 class ArithmeticEncoder:
     BIT16 = 65536
     MASK16 = 0xFFFF
 
-    def __init__(self, output_stream):
+    def __init__(self, output_stream: FOBitOutputStream):
         self.bytesout = output_stream
         self.low = 0
         self.range = self.BIT16
@@ -12,7 +18,7 @@ class ArithmeticEncoder:
         self.carry_byte = 0
         self.carry_buf = 0
 
-    def encode(self, model, symbol, could_have_ended=False):
+    def encode(self, model: LLMArithmeticModel, symbol, could_have_ended=False):
         if could_have_ended:
             if self.next_free_end:
                 self.next_free_end += (self.free_end_even + 1) * 2
@@ -56,7 +62,7 @@ class ArithmeticEncoder:
                     # if nextfreeend is this even, next step must reduce evenness
                     self.free_end_even &= self.MASK16
 
-                    self.byte_with_carry(low_decrement >> 16)
+                    self._byte_with_carry(low_decrement >> 16)
                     self.interval_bits -= 8
 
                 if self.range > (self.BIT16 >> 1):
@@ -73,7 +79,7 @@ class ArithmeticEncoder:
                     (self.low + self.free_end_even) & ~self.free_end_even
                 ) | (self.free_end_even + 1)
 
-    def byte_with_carry(self, out_byte):
+    def _byte_with_carry(self, out_byte):
         if self.carry_buf:
             if out_byte >= 256:
                 self.bytesout.write(self.carry_byte + 1)
@@ -96,11 +102,11 @@ class ArithmeticEncoder:
         self.next_free_end <<= 24 - self.interval_bits
 
         while self.next_free_end:
-            self.byte_with_carry(self.next_free_end >> 16)
+            self._byte_with_carry(self.next_free_end >> 16)
             self.next_free_end = (self.next_free_end & self.MASK16) << 8
 
         if self.carry_buf:
-            self.byte_with_carry(0)
+            self._byte_with_carry(0)
 
         # Reset for potential future use
         self.low = 0
