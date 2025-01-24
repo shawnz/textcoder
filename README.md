@@ -67,6 +67,8 @@ This project wouldn't have been possible without the work of Matt Timmermans and
 
   This 2019 paper from Zachary Ziegler, Yuntian Deng, and Alexander Rush explores the same idea as what is proposed here. They also provide a [web application](https://steganography.live/) and [associated source code](https://github.com/harvardnlp/NeuralSteganography) for their implementation. See also the [Hacker News discussion of the app](https://news.ycombinator.com/item?id=20889881).
 
+  Their project has some key differences from this one. It is able to achieve better efficiency with natural language inputs by compressing the inputs first before decompressing them under a different LLM context. Textcoder does not compress the inputs first. However, Textcoder supports authentication and encryption of the inputs, which their system does not.
+
 - **[Perfectly Secure Steganography Using Minimum Entropy Coupling](https://arxiv.org/pdf/2210.14889)**
 
   This 2023 paper from Christian Schroeder de Witt, Samuel Sokota, J. Zico Kolter, Jakob Foerster, and Martin Strohmeier describes some possible improvements upon this technique. The paper was [discussed on Hacker News here](https://news.ycombinator.com/item?id=36022598). See also the [Quanta article covering this paper](https://www.quantamagazine.org/secret-messages-can-hide-in-ai-generated-media-20230518/) and the [associated Hacker News discussion of that article](https://news.ycombinator.com/item?id=36004980).
