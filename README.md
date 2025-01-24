@@ -53,7 +53,7 @@ The Llama tokenizer used in this project sometimes permits multiple possible tok
 
 ## Acknowledgements
 
-This project wouldn't have been possible without the work of Matt Timmermans and his [Bijective Arithmetic Coding algorithm](web.archive.org/web/20210901195459/http://www3.sympatico.ca/mt0000/biacode/). The bijective arithmetic coding algorithm is necessary to be able to decompress arbitrary bit streams. Matt Timmermans' code was ported to Python with the assistance of Anthropic's Claude 3.5 Sonnet for inclusion in this project.
+This project wouldn't have been possible without the work of Matt Timmermans and his [Bijective Arithmetic Coding algorithm](https://web.archive.org/web/20210901195459/http://www3.sympatico.ca/mt0000/biacode/). The bijective arithmetic coding algorithm is necessary to be able to decompress arbitrary bit streams. Matt Timmermans' code was ported to Python with the assistance of Anthropic's Claude 3.5 Sonnet for inclusion in this project.
 
 ## Similar Projects
 
