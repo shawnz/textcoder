@@ -1,5 +1,3 @@
-import typing
-
 from textcoder.foio import FOBitOutputStream
 from textcoder.model import LLMArithmeticModel
 
