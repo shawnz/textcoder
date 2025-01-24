@@ -55,7 +55,7 @@ To mitigate this, the encoder will try decoding the output before returning it. 
 
 ## Acknowledgements
 
-This project wouldn't have been possible without the work of Matt Timmermans and his [Bijective Arithmetic Coding algorithm](https://web.archive.org/web/20210901195459/http://www3.sympatico.ca/mt0000/biacode/). The bijective arithmetic coding algorithm is necessary to be able to decompress arbitrary bit streams. Matt Timmermans' code was ported to Python with the assistance of Anthropic's Claude 3.5 Sonnet for inclusion in this project.
+This project wouldn't have been possible without the work of Matt Timmermans and his [Bijective Arithmetic Coding algorithm](https://web.archive.org/web/20210901195459/http://www3.sympatico.ca/mt0000/biacode/). The bijective arithmetic coding algorithm is necessary to be able to decompress arbitrary bit streams. Matt Timmermans' code was ported to Python with the assistance of Anthropic's Claude 3.5 Sonnet for inclusion in this project. See [the original ported code here](https://github.com/shawnz/textcoder/blob/8c7c438b6b206aced0a806516b91a0b05bf65230/mtimmerm/biacode/src/python/anthropic/biacode.py).
 
 ## Similar Projects
 
