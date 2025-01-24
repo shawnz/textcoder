@@ -89,7 +89,7 @@ class LLMArithmeticModel:
         idx = self._sorted_tok_id_indices[sorted_idx]
         low = self._probs[idx - 1].item() if idx > 0 else 0
         high = self._probs[idx].item()
-        return low, high # type: ignore
+        return low, high  # type: ignore
 
     def get_symbol(self, p: int) -> tuple[int, int, int]:
         if self._probs_dirty:
@@ -98,7 +98,7 @@ class LLMArithmeticModel:
         token_id = self._prob_tok_ids[idx].item()
         low = self._probs[idx - 1].item() if idx > 0 else 0
         high = self._probs[idx].item()
-        return token_id, low, high # type: ignore
+        return token_id, low, high  # type: ignore
 
     def prob_one(self) -> int:
         return _TARGET_PROB_ONE

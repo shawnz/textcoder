@@ -25,7 +25,7 @@ def _get_tokenizer_and_arithmetic_model():
     ).to(hf_model.device)  # type: ignore
     arithmetic_model = LLMArithmeticModel(
         hf_model,
-        initial_input, # type: ignore
+        initial_input,  # type: ignore
         list(tokenizer.added_tokens_decoder.keys()),
     )
     return tokenizer, arithmetic_model
