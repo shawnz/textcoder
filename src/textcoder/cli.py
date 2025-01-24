@@ -51,8 +51,8 @@ def main():
     else:
         try:
             output_stream = io.BytesIO()
-            encode(stdin_str, output_stream)
+            encode(stdin_str.removesuffix("\n"), output_stream)
             plaintext = decrypt(password, output_stream.getvalue())
-            print(plaintext.decode())
+            print(plaintext.decode(), end="")
         except Exception as ex:
             parser.error(f"unable to decrypt encrypted message: {ex}")
