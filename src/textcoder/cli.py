@@ -42,6 +42,7 @@ def main():
         output_string = decode(input_stream)
         if not args.no_validate:
             try:
+                gc.collect()
                 output_stream = io.BytesIO()
                 encode(output_string, output_stream)
                 decrypt(password, output_stream.getvalue())
