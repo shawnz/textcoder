@@ -1,4 +1,5 @@
 import typing
+
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 from textcoder.arithmetic_decoder import ArithmeticDecoder
