@@ -16,6 +16,12 @@ cryptography = "^44.0.0"
 [tool.poetry.scripts]
 textcoder = "textcoder.cli:main"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.9.3"
+
+[tool.ruff.lint]
+select = ["E", "F", "UP", "B", "SIM", "I"]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
