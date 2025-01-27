@@ -1,4 +1,5 @@
 import argparse
+import gc
 import getpass
 import io
 import sys
