@@ -35,25 +35,28 @@ def main():
     password = (
         args.password if args.password is not None else getpass.getpass()
     ).encode()
-    stdin_str = sys.stdin.read()
     if not args.decode:
-        encrypted_bytes = encrypt(password, stdin_str.encode())
-        input_stream = io.BytesIO(encrypted_bytes)
-        output_string = decode(input_stream)
+        stdin_bytes = sys.stdin.buffer.read()
+        encrypted_bytes = encrypt(password, stdin_bytes)
+        with io.BytesIO(encrypted_bytes) as input_stream:
+            stegotext = decode(input_stream)
         if not args.no_validate:
             try:
                 gc.collect()
-                output_stream = io.BytesIO()
-                encode(output_string, output_stream)
-                decrypt(password, output_stream.getvalue())
+                with io.BytesIO() as validation_stream:
+                    encode(stegotext, validation_stream)
+                    validation_bytes = validation_stream.getvalue()
+                decrypt(password, validation_bytes)
             except Exception as ex:
                 parser.error(f"unable to validate encrypted message: {ex}")
-        print(output_string)
+        print(stegotext)
     else:
         try:
-            output_stream = io.BytesIO()
-            encode(stdin_str.removesuffix("\n"), output_stream)
-            plaintext = decrypt(password, output_stream.getvalue())
-            print(plaintext.decode(), end="")
+            stdin_str = sys.stdin.read().removesuffix("\n")
+            with io.BytesIO() as output_stream:
+                encode(stdin_str, output_stream)
+                output_bytes = output_stream.getvalue()
+            plaintext = decrypt(password, output_bytes)
+            sys.stdout.buffer.write(plaintext)
         except Exception as ex:
             parser.error(f"unable to decrypt encrypted message: {ex}")
