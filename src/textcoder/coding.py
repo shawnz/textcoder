@@ -22,7 +22,10 @@ def _get_tokenizer_and_arithmetic_model():
         _HF_MODEL_NAME, torch_dtype="auto", device_map="auto"
     )
     initial_input = tokenizer.apply_chat_template(
-        _INITIAL_CONVERSATION, add_generation_prompt=True, return_tensors="pt"
+        _INITIAL_CONVERSATION,
+        add_generation_prompt=True,
+        return_tensors="pt",
+        return_dict=True,
     ).to(hf_model.device)  # type: ignore
     arithmetic_model = LLMArithmeticModel(
         hf_model,

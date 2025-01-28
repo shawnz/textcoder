@@ -1,3 +1,5 @@
+from typing import Any
+
 import torch
 import transformers
 
@@ -9,17 +11,29 @@ class LLMArithmeticModel:
     def __init__(
         self,
         hf_model: transformers.PreTrainedModel,
-        initial_input: list[int],
+        initial_input: dict[str, Any],
         special_token_ids: list[int],
     ):
         self._model = hf_model
+        self._input = initial_input
         self._special_token_ids = special_token_ids
-        self._past_key_values = transformers.DynamicCache()
-        self._logits = hf_model(
-            input_ids=initial_input, past_key_values=self._past_key_values
-        ).logits[0, -1]
+        self._logits = hf_model(**initial_input).logits[0, -1]
         self._probs_dirty = True
         self._sorted_tok_ids_dirty = True
+
+    @staticmethod
+    def _append_tensor(tensor: torch.Tensor, value: Any) -> torch.Tensor:
+        tail = torch.tensor([[value]], dtype=tensor.dtype, device=tensor.device)
+        return torch.cat((tensor, tail), dim=1)
+
+    @classmethod
+    def _append_input_dict(
+        cls, input_dict: dict[str, Any], token_id: int
+    ) -> dict[str, Any]:
+        return {
+            "input_ids": cls._append_tensor(input_dict["input_ids"], token_id),
+            "attention_mask": cls._append_tensor(input_dict["attention_mask"], 1),
+        }
 
     def _recompute_probs(self):
         # filter out special tokens
@@ -64,10 +78,8 @@ class LLMArithmeticModel:
         self._sorted_tok_ids_dirty = False
 
     def update(self, token_id: int):
-        self._logits = self._model(
-            input_ids=torch.tensor([[token_id]], device=self._model.device),
-            past_key_values=self._past_key_values,
-        ).logits[0, -1]
+        self._input = self._append_input_dict(self._input, token_id)
+        self._logits = self._model(**self._input).logits[0, -1]
         self._probs_dirty = True
         self._sorted_tok_ids_dirty = True
 
