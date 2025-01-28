@@ -49,9 +49,19 @@ cat encoded.txt | poetry run textcoder -d -p '<password>'
 
 ## Known Issues
 
+### Conflicting Tokenizations 
+
 The Llama tokenizer used in this project sometimes permits multiple possible tokenizations for a given string. As a result, it is sometimes the case that the arithmetic coder produces a series of tokens which don't match the canonical tokenization for that string exactly. In these cases, decoding will fail and you may need to try to run the encoding process again.
 
 To mitigate this, the encoder will try decoding the output before returning it. This validation step requires extra time and memory usage. To skip validation, use the `-n` (`--no-validate`) parameter.
+
+### Non-Deterministic Behaviour
+
+The Llama model used in this project is not guaranteed to provide completely deterministic behaviour. Due to issues such as floating-point inaccuracy and differing algorithms on different hardware and software versions, it is possible that outputs can change between platforms, or even between successive runs on the same platform. When this happens, the output will not be able to be decoded.
+
+Some steps are taken in this project to use deterministic algorithms when possible, but this doesn't guarantee that different platforms will produce the same outputs. For best results, make sure you are decoding messages on the same platform that they were encoded on.
+
+To help mitigate the impact of hardware differences, consider disabling hardware acceleration using the `-a` (`--no-acceleration`) parameter. However, this will greatly decrease performance.
 
 ## Acknowledgements
 
