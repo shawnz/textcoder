@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 import torch
@@ -5,6 +6,9 @@ import transformers
 
 _TARGET_PROB_ONE = 32768
 _TOP_K = 100
+
+
+_logger = logging.getLogger(__name__)
 
 
 class LLMArithmeticModel:
@@ -84,6 +88,7 @@ class LLMArithmeticModel:
         self._sorted_tok_ids_dirty = True
 
     def get_sym_range(self, token_id: int) -> tuple[int, int]:
+        _logger.info(f"querying probability range for token {token_id}")
         if self._sorted_tok_ids_dirty:
             self._recompute_sorted_tok_ids()
         sorted_idx = torch.searchsorted(self._sorted_tok_ids, token_id)
@@ -101,15 +106,18 @@ class LLMArithmeticModel:
         idx = self._sorted_tok_id_indices[sorted_idx]
         low = self._probs[idx - 1].item() if idx > 0 else 0
         high = self._probs[idx].item()
+        _logger.info(f"token id {token_id} has probability range [{low}, {high})")
         return low, high  # type: ignore
 
     def get_symbol(self, p: int) -> tuple[int, int, int]:
+        _logger.info(f"querying token and probability range for probability {p}")
         if self._probs_dirty:
             self._recompute_probs()
         idx = torch.searchsorted(self._probs, p + 1)
         token_id = self._prob_tok_ids[idx].item()
         low = self._probs[idx - 1].item() if idx > 0 else 0
         high = self._probs[idx].item()
+        _logger.info(f"token id {token_id} has probability range [{low}, {high})")
         return token_id, low, high  # type: ignore
 
     def prob_one(self) -> int:

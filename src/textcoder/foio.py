@@ -1,4 +1,7 @@
+import logging
 import typing
+
+_logger = logging.getLogger(__name__)
 
 
 class FOBitOutputStream:
@@ -27,6 +30,7 @@ class FOBitOutputStream:
                 self.reserve0 = self.reserve0 and not self.seg_first
                 self.block_left -= 1
 
+            _logger.info(f"outputting byte 0x{self.seg_first ^ 0x55:x}")
             self.stream.write(bytes([self.seg_first ^ 0x55]))
 
             for _ in range(self.seg_size - 1):
@@ -35,6 +39,7 @@ class FOBitOutputStream:
                     self.block_left = self.block_size - 1
                 else:
                     self.block_left -= 1
+                _logger.info("outputting byte 0x55")
                 self.stream.write(b"\x55")  # 0 ^ 0x55
 
             self.seg_first = byte
@@ -47,6 +52,7 @@ class FOBitOutputStream:
         while True:
             while self.block_left > 0:
                 self.reserve0 = self.reserve0 and not self.seg_first
+                _logger.info(f"outputting byte 0x{self.seg_first ^ 0x55:x}")
                 self.stream.write(bytes([self.seg_first ^ 0x55]))
                 self.seg_first = 0
                 self.block_left -= 1
@@ -84,6 +90,7 @@ class FOBitInputStream:
                 self.in_done = True
                 in_byte = 0
             else:
+                _logger.info(f"read byte 0x{data[0]:x}")
                 in_byte = data[0] ^ 0x55  # XOR with 55 for de-obfuscation
 
         if self.block_left:

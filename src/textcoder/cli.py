@@ -65,6 +65,8 @@ def main():
         try:
             stdin_bytes = sys.stdin.buffer.read()
             encrypted_bytes = encrypt(password, stdin_bytes)
+            if _logger.isEnabledFor(logging.INFO):
+                _logger.info(f"encrypted bytes: 0x{encrypted_bytes.hex()}")
             with io.BytesIO(encrypted_bytes) as input_stream:
                 stegotext = coder.decode(input_stream)
         except OutOfMemoryError:
@@ -82,6 +84,9 @@ def main():
                 with io.BytesIO() as validation_stream:
                     coder.encode(stegotext, validation_stream)
                     validation_bytes = validation_stream.getvalue()
+                if _logger.isEnabledFor(logging.INFO):
+                    _logger.info(f"encrypted bytes:  0x{encrypted_bytes.hex()}")
+                    _logger.info(f"validation bytes: 0x{validation_bytes.hex()}")
                 decrypt(password, validation_bytes)
             except OutOfMemoryError:
                 _logger.error(
@@ -110,6 +115,8 @@ def main():
             with io.BytesIO() as output_stream:
                 coder.encode(stdin_str, output_stream)
                 output_bytes = output_stream.getvalue()
+            if _logger.isEnabledFor(logging.INFO):
+                _logger.info(f"output bytes: 0x{output_bytes.hex()}")
             plaintext = decrypt(password, output_bytes)
             sys.stdout.buffer.write(plaintext)
         except OutOfMemoryError:
