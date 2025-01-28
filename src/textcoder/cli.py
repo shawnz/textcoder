@@ -3,10 +3,11 @@ import gc
 import getpass
 import io
 import logging
+import os
 import sys
 
-from cryptography.exceptions import InvalidTag
-from torch import OutOfMemoryError
+import cryptography
+import torch
 
 from textcoder.coding import LLMArithmeticCoder
 from textcoder.crypto import decrypt, encrypt
@@ -59,6 +60,8 @@ def main():
     password = (
         args.password if args.password is not None else getpass.getpass()
     ).encode()
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:2"
+    torch.use_deterministic_algorithms(True)
     coder = LLMArithmeticCoder(accelerated=not args.no_acceleration)
     if not args.decode:
         _logger.info("encoding starting")
@@ -69,7 +72,7 @@ def main():
                 _logger.info(f"encrypted bytes: 0x{encrypted_bytes.hex()}")
             with io.BytesIO(encrypted_bytes) as input_stream:
                 stegotext = coder.decode(input_stream)
-        except OutOfMemoryError:
+        except torch.OutOfMemoryError:
             _logger.error(
                 "ran out of memory while encrypting message", exc_info=args.verbose
             )
@@ -88,13 +91,13 @@ def main():
                     _logger.info(f"encrypted bytes:  0x{encrypted_bytes.hex()}")
                     _logger.info(f"validation bytes: 0x{validation_bytes.hex()}")
                 decrypt(password, validation_bytes)
-            except OutOfMemoryError:
+            except torch.OutOfMemoryError:
                 _logger.error(
                     "ran out of memory while validating encrypted message",
                     exc_info=args.verbose,
                 )
                 return
-            except (ValueError, InvalidTag):
+            except (ValueError, cryptography.exceptions.InvalidTag):
                 _logger.error(
                     "validation of encrypted message failed. this could be "
                     "due to an ambiguous tokenization or non-deterministic "
@@ -119,12 +122,12 @@ def main():
                 _logger.info(f"output bytes: 0x{output_bytes.hex()}")
             plaintext = decrypt(password, output_bytes)
             sys.stdout.buffer.write(plaintext)
-        except OutOfMemoryError:
+        except torch.OutOfMemoryError:
             _logger.error(
                 "ran out of memory while decrypting message", exc_info=args.verbose
             )
             return
-        except (TypeError, ValueError, InvalidTag):
+        except (TypeError, ValueError, cryptography.exceptions.InvalidTag):
             _logger.error(
                 "decryption failed. this could be due to an incorrect "
                 "password or the data being corrupt.",
