@@ -60,7 +60,7 @@ def main():
     password = (
         args.password if args.password is not None else getpass.getpass()
     ).encode()
-    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:2"
+    os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:8"
     torch.use_deterministic_algorithms(True)
     coder = LLMArithmeticCoder(accelerated=not args.no_acceleration)
     if not args.decode:
