@@ -1,4 +1,4 @@
-import os
+# import os
 
 from cryptography.hazmat.primitives.ciphers.aead import AESGCMSIV
 from cryptography.hazmat.primitives.kdf.argon2 import Argon2id
@@ -21,7 +21,8 @@ def _get_aesgcmsiv(password: bytes, salt: bytes):
 
 
 def encrypt(password: bytes, plaintext: bytes):
-    salt = os.urandom(16)
+    # salt = os.urandom(16)
+    salt = b"\0" * 16
     nonce = salt[:12]
     aesgcmsiv = _get_aesgcmsiv(password, salt)
     ciphertext = aesgcmsiv.encrypt(nonce, plaintext, None)
