@@ -60,7 +60,11 @@ class LLMArithmeticCoder:
                 # skip bos token
                 continue
             if _logger.isEnabledFor(logging.INFO):
-                _logger.info(f"encoding token {i + 1} of {len(input_tokens.input_ids)}")
+                percent_completed = 100 * i / len(input_tokens.input_ids)
+                _logger.info(
+                    f"encoding token {i + 1} of {len(input_tokens.input_ids)} "
+                    f"({percent_completed:.2f}% completed)"
+                )
                 _logger.info(f"token id: {input_token}")
                 token_str = tokenizer.decode(input_token)
                 _logger.info(f"token str: {repr(token_str)}")
@@ -86,8 +90,10 @@ class LLMArithmeticCoder:
         while True:
             if _logger.isEnabledFor(logging.INFO):
                 bytes_decoded = input_stream.tell()
+                percent_completed = 100 * bytes_decoded / total_bytes
                 _logger.info(
                     f"decoding token {i + 1} (at byte {bytes_decoded} of {total_bytes})"
+                    f"({percent_completed:.2f}% completed)"
                 )
             sym = decoder.decode(arithmetic_model, True)
             _logger.info(f"token id: {sym}")
