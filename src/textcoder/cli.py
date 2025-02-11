@@ -18,7 +18,7 @@ _logger = logging.getLogger(__name__)
 def main():
     parser = argparse.ArgumentParser(
         prog="textcoder",
-        description="Stegangraphic message encoder using LLMs",
+        description="Steganographic message encoder using LLMs",
     )
     parser.add_argument(
         "-p",

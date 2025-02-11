@@ -1,7 +1,7 @@
 [project]
 name = "textcoder"
 version = "0.1.0"
-description = "Stegangraphic message encoder using LLMs"
+description = "Steganographic message encoder using LLMs"
 authors = [{ name = "Shawn Zivontsis", email = "shawnz@shawnz.org" }]
 readme = "README.md"
 license-files = ["LICENSE.md"]
