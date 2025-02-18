@@ -35,6 +35,8 @@ Additionally, Textcoder makes use of the [Llama 3.2 1B Instruct](https://hugging
 huggingface-cli login
 ```
 
+**WARNING**: The Llama 3.2 family of language models does not allow use of the model with the intent of representing the output as being human-generated. This might limit the situations in which you are allowed to use Textcoder. See [this issue](https://github.com/shawnz/textcoder/issues/1) for details.
+
 Finally, you can now run Textcoder using the `textcoder` command. To encode a message, run:
 
 ```bash
