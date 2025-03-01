@@ -15,6 +15,12 @@ _INITIAL_CONVERSATION = [
         "content": "You are a typical Twitter user. Respond with your tweet.",
     },
 ]
+_DEFAULT_CHAT_TEMPLATE = (
+    "{% for message in messages %}"
+    "{{message.content}}"
+    "{% if not loop.last %} {% endif %}"
+    "{% endfor %}"
+)
 
 
 _logger = logging.getLogger(__name__)
@@ -31,8 +37,12 @@ class LLMArithmeticCoder:
         hf_model = AutoModelForCausalLM.from_pretrained(
             _HF_MODEL_NAME, torch_dtype="auto", **hf_model_options
         )
+        chat_template = (
+            _DEFAULT_CHAT_TEMPLATE if tokenizer.chat_template is None else None
+        )
         initial_input = tokenizer.apply_chat_template(
             _INITIAL_CONVERSATION,
+            chat_template=chat_template,
             add_generation_prompt=True,
             return_tensors="pt",
             return_dict=True,
