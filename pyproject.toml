@@ -7,10 +7,10 @@ readme = "README.md"
 license-files = ["LICENSE.md"]
 requires-python = ">=3.10"
 dependencies = [
-    "transformers (>=4.48.3,<5.0.0)",
-    "torch (>=2.6.0,<3.0.0)",
-    "accelerate (>=1.3.0,<2.0.0)",
-    "cryptography (>=44.0.1,<45.0.0)",
+    "transformers (>=4.51.3,<5.0.0)",
+    "torch (>=2.7.0,<3.0.0)",
+    "accelerate (>=1.6.0,<2.0.0)",
+    "cryptography (>=44.0.3,<45.0.0)",
 ]
 
 [project.scripts]
@@ -20,7 +20,7 @@ textcoder = "textcoder.cli:main"
 packages = [{ include = "textcoder", from = "src" }]
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.9.5"
+ruff = "^0.11.9"
 
 [tool.ruff.lint]
 select = ["E", "F", "UP", "B", "SIM", "I"]
