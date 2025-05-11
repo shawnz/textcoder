@@ -102,8 +102,8 @@ class LLMArithmeticCoder:
                 bytes_decoded = input_stream.tell()
                 percent_completed = 100 * bytes_decoded / total_bytes
                 _logger.info(
-                    f"decoding token {i + 1} (at byte {bytes_decoded} of {total_bytes})"
-                    f"({percent_completed:.2f}% completed)"
+                    f"decoding token {i + 1} (at byte {bytes_decoded} of "
+                    f"{total_bytes}) ({percent_completed:.2f}% completed)"
                 )
             sym = decoder.decode(arithmetic_model, True)
             _logger.info(f"token id: {sym}")
